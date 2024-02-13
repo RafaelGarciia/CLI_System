@@ -7,16 +7,17 @@ from os.path import isfile
 
 
 
-
+# Class padrão do modulo
 class System_MP():
 	def __init__(self) -> None:
+		# Definindo as variavels principais
 		self.fornecedor = None
 
-
+	# Menu principal do modulo MP
 	def Main_menu(self, style):
 		def cad_menu():
 			while True:
-				system("cls")
+				system("cls")	# Limpa a tela
 				match inq.menu(
 					"Cadastro",
 					[
@@ -30,41 +31,20 @@ class System_MP():
 					case "emp"	: input("emp")
 					case 	0	: break
 					
-
+		# Menu
 		while True:
-			system("cls")
-			match inq.menu(
+			system("cls")	# Limpa a tela
+			
+			option = inq.menu(
 				"Materia Prima",
 				[
 					("cad", "Cadastros"),
 					(0, "Voltar")
 				],
 				style = style
-			):
+			)
+
+			match option:
 				case "cad"	: cad_menu()
 				case	0	: break
 
-	
-
-			
-		
-	def load_db():
-		database_path = f"{getcwd()}\\data.db"
-		
-		if isfile(database_path):
-			base = sql.Data_base(database_path)
-		else:
-			if inq.confirm(
-				"Banco de dados não existente.\n  Deseja recrialo?",
-				qmark="x",
-				style={"questionmark" : "#ff0000"}
-			):
-				#base = sql.Data_base(database_path)
-				#base.create_table("", "user_name, password, level")
-				#base.insert("Users", ["root", "masterqi", 0])
-				...
-			else:
-				pass
-
-
-System_MP()
