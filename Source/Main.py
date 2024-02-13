@@ -1,3 +1,4 @@
+# Importando dependencias e bibliotecas
 from Modules import (
 	module_MP		as mp,
 	module_SQL		as con_sql,
