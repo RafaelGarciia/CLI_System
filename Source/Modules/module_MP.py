@@ -4,7 +4,7 @@ from Librarys import (
 )
 from os import ( getcwd, system )
 from os.path import isfile
-
+from InquirerPy.separator import Separator
 
 
 
@@ -14,57 +14,76 @@ class System_MP():
 
 
 	def Main_menu(self, style):
-		def cad_menu():
-			while True:
-				system("cls")
-				match inq.menu(
-					"Cadastro",
-					[
-						("forn", "Fornecedor"),
-						("emp", "Empresa"),
-						(0, "Voltar")
-					],
-					style = style
-				):
-					case "forn"	: input("forn")
-					case "emp"	: input("emp")
-					case 	0	: break
-					
-
 		while True:
 			system("cls")
 			match inq.menu(
 				"Materia Prima",
 				[
 					("cad", "Cadastros"),
+					Separator(),
 					(0, "Voltar")
 				],
 				style = style
 			):
-				case "cad"	: cad_menu()
+				case "cad"	: 
+					
+					self.cad_menu(style)
 				case	0	: break
 
-	
+	def cad_menu(self, style):
+		def cad_fornecedor():
+			text_name = "Nome"
+			text_abrev = "Abreviação"
+			while True:
+				system("cls")
+				match inq.menu(
+					"Cadastro de fornecedor",
+					[
+						("name", text_name),
+						("abrev", text_abrev),
+						Separator(),
+						(1, "Confirmar"),
+						(0, "Voltar")
 
-			
-		
-	def load_db():
-		database_path = f"{getcwd()}\\data.db"
-		
-		if isfile(database_path):
-			base = sql.Data_base(database_path)
-		else:
-			if inq.confirm(
-				"Banco de dados não existente.\n  Deseja recrialo?",
-				qmark="x",
-				style={"questionmark" : "#ff0000"}
+					]
+				):
+					case "name":
+						name = inq.entry('Digite o nome')
+						text_name 	= f"Nome  : {name}"
+					case "abrev":
+						abrev = inq.entry('Digite uma abreviação')
+						text_abrev 	= f"Abrev.: {abrev}"
+					
+					case	1:
+						system("cls")
+						print(f"Name      : {name }")
+						print(f"Abreviação: {abrev}")
+						if inq.confirm("Confirmar as informções acima?", "s"):
+							self.fornecedor = {
+								name: {
+									"name"			: name,
+									"abreviação"	: abrev
+								}
+							}
+							input(self.fornecedor)
+							break
+					
+					case 0: break
+
+
+
+		while True:
+			system("cls")
+			match inq.menu(
+				"Cadastro",
+				[
+					("forn", "Fornecedor"),
+					("emp", "Empresa"),
+					Separator(),
+					(0, "Voltar")
+				],
+				style = style
 			):
-				#base = sql.Data_base(database_path)
-				#base.create_table("", "user_name, password, level")
-				#base.insert("Users", ["root", "masterqi", 0])
-				...
-			else:
-				pass
-
-
-System_MP()
+				case "forn"	: cad_fornecedor()
+				case "emp"	: input("emp")
+				case 	0	: break
