@@ -1,6 +1,9 @@
 from InquirerPy 				import inquirer, get_style
 from InquirerPy.base.control 	import Choice
+from InquirerPy.separator 		import Separator
 
+def separator():
+	return Separator()
 
 def menu(
 		message				: str,

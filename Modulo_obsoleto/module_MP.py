@@ -14,17 +14,16 @@ class System_MP():
 	def Main_menu(self, style):
 		while True:
 			system("cls")
-			match inq.menu(
+			option = inq.menu(
 				"Materia Prima",
-				[
-					("cad", "Cadastros"),
+				[	("cad", "Cadastros"),
 					Separator(),
 					(0, "Voltar")
 				],
 				style = style
-			):
+			)
+			match option:
 				case "cad"	: 
-					
 					self.cad_menu(style)
 				case	0	: break
 
@@ -34,17 +33,16 @@ class System_MP():
 			text_abrev = "Abreviação"
 			while True:
 				system("cls")
-				match inq.menu(
+				option = inq.menu(
 					"Cadastro de fornecedor",
-					[
-						("name", text_name),
+					[	("name"	, text_name ),
 						("abrev", text_abrev),
 						Separator(),
-						(1, "Confirmar"),
-						(0, "Voltar")
-
+						(   1	, "Confirmar"),
+						(   0	, "Voltar")
 					]
-				):
+				)
+				match option:
 					case "name":
 						name = inq.entry('Digite o nome')
 						text_name 	= f"Nome  : {name}"

@@ -1,11 +1,22 @@
 from Modules import (
-	module_MP		as mp,
 	module_SQL		as con_sql,
 	module_Security	as security
 )
+from Librarys import (
+	Lib_Inquirer as inq
+)
 from os import system, getcwd
-from Librarys import Lib_Inquirer as inq
-from InquirerPy.separator import Separator
+
+
+
+# Mecanismos:
+def fornecedor_valid(name_answer):
+	""" Consulta se o fornecedor já esta cadastado """
+	if name_answer in fornecedores_list:
+			return False
+	else: 	return True
+
+
 
 
 # Iniciando o banco de dados
@@ -25,6 +36,7 @@ for item in data_base.query("Users"):
 			"level"		: item[2]
 		}
 	})
+
 # Iniciando a tela de login
 security.login(users_db)
 
@@ -37,85 +49,89 @@ default_style = {
 	"pointer"		: "#89c6e0 bold",
 }
 
+# Definindo a lista para o controle de fornecedores cadastrados
 fornecedores_list = {}
+# Definindo a lista para o controle de mepresas cadastradas
+empresas_list = {}
 
 
 
-def fornecedor_valid(name_answer):
-	if name_answer in fornecedores_list:
-		return False
-	else:
-		return True
 
-
+# System de Cadastro de Materia Prima
 def System_MP():
+
+	# Menu Principal de cadastros
 	def cad_menu():
+
+		# Menu de Cadastro de Fornecedores
 		def cad_fornecedor():
 			text_name = "Nome"
 			text_abrev = "Abreviação"
+			
+			# Loop do meu
 			while True:
 				system("cls")
 				option = inq.menu(
 					"Cadastro de fornecedor",
-					[	("name", text_name),
-	  					("abrev", text_abrev),
-						Separator(),
-						(1, "Confirmar"),
-						(0, "voltar")
-					]
+					[	("name"	, text_name 	),
+	  					("abrev", text_abrev	),
+						inq.separator(			),
+						(	1	, "Confirmar"	),
+						(	0	, "voltar"		)
+					], style = default_style
 				)
+
 				match option:
-					case "name"	:
+					case "name"	:			# Inserindo Nome do fornecedor
 						name = inq.entry(
 							"Digite o nome",
-					   		validate=fornecedor_valid,
-							invalid_message="Fornecedor já cadastrado."
+					   		validate		= fornecedor_valid,
+							invalid_message	= "Fornecedor já cadastrado."
 						)
 						text_name = f"Nome  : {name}"
-					case "abrev":
+						
+					case "abrev":			# Inserindo a abreviação (-Temporaria-)
 						abrev = inq.entry("Digite uma abreviação")
 						text_abrev = f"Abrev.: {abrev}"
-					case 1:
+					
+					case 1:					# Confirma as inserções
 						system("cls")
-						print(f"Name      : {name }")
-						print(f"Abreviação: {abrev}")
+						print (f"Name      : {name }")
+						print (f"Abreviação: {abrev}")
 						if inq.confirm("Confirmar as informções acima?", "s"):
-							fornecedores_list.update({
-								name: {
-									"name"			: name,
-									"abreviação"	: abrev
-								}
-							})
-							input(fornecedores_list)
+							fornecedores_list.update(
+								{ name: {	"name"			: name,
+											"abreviação"	: abrev	} }
+							)
 							break
+					
+					case 0: break			# retorna ao Menu Principal
 
-
+		# Loop Cad_fornecedor
 		while True:
 			system('cls')
 			option = inq.menu(
 				"Cadastro",
-				[	("forn", "Fornecedor"),
-					("emp", "Empresa"),
-					Separator(),
-					(0, "Voltar")
-				],
-				style = default_style
+				[	("forn"	, "Fornecedor"	),
+					("emp"	, "Empresa"	 	),
+					inq.separator(			),
+					(	0	, "Voltar"		)
+				], style = default_style
 			)
 			match option:
 				case "forn"	: cad_fornecedor()
 				case "emp"	: ...
 				case 0		: break
 
-
+	# Loop Cad_menu
 	while True:
 		system("cls")
 		option = inq.menu(
 			"Materia Prima",
-			[	("cad", "Cadastros"),
-				Separator(),
-				(0, "Voltar")
-			],
-			style = default_style
+			[	("cad"	, "Cadastros"	),
+				inq.separator(			),
+				(	0	, "Voltar"		)
+			], style = default_style
 		)
 		match option:
 			case "cad": cad_menu()
@@ -130,20 +146,18 @@ def System_MP():
 
 # Main Loop
 while True:
-	system('cls')	# Limpa a tela
+	system('cls')		# Limpa a tela
 	option = inq.menu(
 		"Main Menu",
-		[
-			("mp"	, "Systema de Materia prima"),
-			(0		, "Sair")
-		],
-		style = default_style
+		[	(  "mp"	, "Systema de Materia prima"),
+			(	0	, "Sair")
+		], style = default_style
 	)
 
 	match option:
-		case "mp":
-			sys_MP = System_MP()
-		case	0: break
+		case "mp":	sys_MP = System_MP()
+		
+		case	0: 	break
 
 
 
