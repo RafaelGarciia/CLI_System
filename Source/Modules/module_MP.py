@@ -1,9 +1,7 @@
 from Librarys import (
 	Lib_Inquirer as inq,
-	Lib_SQLite3	 as sql
 )
-from os import ( getcwd, system )
-from os.path import isfile
+from os import system
 from InquirerPy.separator import Separator
 
 
