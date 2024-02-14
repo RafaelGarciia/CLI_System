@@ -65,8 +65,11 @@ def System_MP():
 
 		# Menu de Cadastro de Fornecedores
 		def cad_fornecedor():
-			text_name = "Nome"
-			text_abrev = "Abreviação"
+			text_name 		= "Nome"
+			text_empresa  	= "Empresa"
+			text_nome_nota 	= "Nome na nota"
+			text_remetente 	= "Remetente"
+			text_motorista 	= "Motorista"
 			
 			# Loop do meu
 			while True:
@@ -74,7 +77,10 @@ def System_MP():
 				option = inq.menu(
 					"Cadastro de fornecedor",
 					[	("name"	, text_name 	),
-	  					("abrev", text_abrev	),
+	  					("emp"	, text_empresa	),
+						("nom_n", text_nome_nota),
+						("reme"	, text_remetente),
+						("moto"	, text_motorista),
 						inq.separator(			),
 						(	1	, "Confirmar"	),
 						(	0	, "voltar"		)
@@ -90,15 +96,17 @@ def System_MP():
 						)
 						text_name = f"Nome  : {name}"
 						
-					case "abrev":			# Inserindo a abreviação (-Temporaria-)
+					case "emp":			# Inserindo a abreviação 								<-- Mudar (-Temporaria-)
 						abrev = inq.entry("Digite uma abreviação")
-						text_abrev = f"Abrev.: {abrev}"
+						#text_abrev = f"Abrev.: {abrev}"
 					
 					case 1:					# Confirma as inserções
 						system("cls")
 						print (f"Name      : {name }")
 						print (f"Abreviação: {abrev}")
 						if inq.confirm("Confirmar as informções acima?", "s"):
+							
+							
 							fornecedores_list.update(
 								{ name: {	"name"			: name,
 											"abreviação"	: abrev	} }
@@ -106,6 +114,29 @@ def System_MP():
 							break
 					
 					case 0: break			# retorna ao Menu Principal
+
+		def menu_empresa():
+
+
+			while True:
+				system('cls')
+				option = inq.menu(
+					"Cadastro de Empresa",
+					[	("novo"	, "Nova"	),
+						("list"	, "Listar"	),
+	  					inq.separator(		),
+						(	0	, "Voltar"	)
+					], style = default_style
+				)
+
+				match option:
+					case "novo":	
+
+
+
+
+
+
 
 		# Loop Cad_fornecedor
 		while True:
