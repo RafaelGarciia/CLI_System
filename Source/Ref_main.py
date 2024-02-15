@@ -10,15 +10,6 @@ from os import system, getcwd
 from time import sleep
 
 
-# Dicionario para o estilo do sistema
-default_style = {
-	"questionmark"	: "#4040e3 bold",
-	"question"		: "#ffffff",
-	"input"			: "#000000",
-
-	"pointer"		: "#89c6e0 bold",
-}
-
 
 # Funções para adicionar
 def add_usuario(nome, password, level):
@@ -110,7 +101,6 @@ def load_db() -> sql.Data_base:
 			banco_dados.create_table( "Usuarios",
 				[ "user_name", "password", "level" ]
 			)
-			
 			banco_dados.create_table("Empresas",
 				["nome"]
 			)
@@ -126,6 +116,7 @@ def load_db() -> sql.Data_base:
 			input("O sistema não funciona sem o banco de dados.")
 			exit()
 
+	# Carrega as variaveis principais com os dados do banco de dados
 	for item in banco_dados.query('Usuarios'):
 		list_usuario.update({
 			item[0]: {
@@ -146,62 +137,95 @@ def load_db() -> sql.Data_base:
 			}
 		})
 
+	# Retorna o objeto banco para ser utilizado nos cadastros
 	return banco_dados
 banco_dados		= load_db()
 
 
+
+
+
+def base_menu(message:str, buttons:list[str, type]) -> None:
+	_choices = []
+	_index = 0
+	for _item in buttons:
+		if   type(_item) == type(inq.separator()): _choices.append(_item)
+		elif type(_item) == tuple:
+			_choices.append((_index, _item[0]))
+		_index += 1
+
+	while True:
+		system("cls")
+		_option = inq.menu( message, _choices,
+			style = {
+				"questionmark"	: "#4040e3 bold",
+				"question"		: "#ffffff",
+				"input"			: "#000000",
+				"pointer"		: "#89c6e0 bold",
+			}
+		)
+		
+		comand = buttons[_option][1]
+		if comand == "break":	break
+		else:	comand()
+	
+
+
 # Menus
-def Main_menu():
-	while True:
-		system('cls')
-		option = inq.menu(
-			"Main Menu",
-			[	(	"cad"	, "Cadastros"		),
-				inq.separator(					),
-				(	0		, "Sair"			),
-			], style = default_style
-		)
+def Main_menu():	# Menu principal
+	base_menu(
+		"Main Menu",
+		[	("Cadastros"	, menu_cadastro			),
+			inq.separator(							),
+			("Sair"			, exit					),
+		]
+	)
 
-		match option:
-			case "cad":	menu_cadastro()
-			case 	0 : exit()
 
-# Menu de cadastros gerais
-def menu_cadastro():
-	while True:
-		system('cls')
-		option = inq.menu(
-			"Cadastros",
-			[	(	"emp"	, "Empresa"			),
-				(	"for"	, "Fornecedor"		),
-				inq.separator(					),
-				(	0		, "Voltar"			),
-			], style = default_style
-		)
-		match option:
-			case "emp":	menu_cad_empresa()
-			case "for": menu_cad_fornecedor()
-			case 	0 : break
+def menu_cadastro():	# Menu de cadastros gerais
+	base_menu(
+		"Cadastros",
+		[	("Empresa"		, menu_cad_empresa		),
+			("Fornecedor"	, menu_cad_fornecedor	),
+			inq.separator(							),
+			("Voltar"		, "break"				),
+
+		]
+	)
 
 
 
 def menu_cad_empresa():
-	while True:
-		system('cls')
-		option = inq.menu(
-			"Cadastro de Empresa",
-			[	(	"nova"	, "Nova"			),
-				(	"list"	, "Listar"			),
-				inq.separator(					),
-				(	0		, "Voltar"			),
-			], style = default_style
-		)
-		match option:
-			case "nova": nova_empresa()
-			case "list": input(list_empresa)				# <- Criar uma função para isso.
-			case 	0  : break
+	base_menu(
+		"Cadastros",
+		[	("Nova"		, nova_empresa				),
+			("Listar"	, listar_empresa			),
+			inq.separator(							),
+			("Voltar"		, "break"				),
+		]
+	)
+
 
 def nova_empresa():
+	text_name = "Nome"
+	base_menu(
+		"Cadastro de Empresa",
+		[	(text_name, entry_nome	),
+			inq.separator(			),
+			("Confirmar", )
+
+		]
+	)
+
+def entry_nome(text_nome):
+	nome = inq.entry(
+		text_nome,
+		validate=valid_empresa,
+		invalid_message= "Empresa já cadastrada."
+	)
+	return f"Nome: {nome}"
+
+
 	text_nome = "Nome da empresa"
 	while True:
 		system('cls')
@@ -213,6 +237,9 @@ def nova_empresa():
 				(	0		, "Voltar"			),
 			], style = default_style
 		)
+
+
+
 		match option:
 			case "nome": 
 				nome = inq.entry(
@@ -221,7 +248,11 @@ def nova_empresa():
 					invalid_message = "Empresa já cadastrada."
 				)
 				text_nome = f"Nome: {nome}"
-			
+
+def confirm_empresa(text_name):
+	system('cls')
+	print()
+
 			case	1 : 
 				system('cls')
 				print(text_nome)
@@ -236,7 +267,10 @@ def nova_empresa():
 
 			case 	0 : break
 
-
+def listar_empresa():
+	for item in list_empresa:
+		print(item)
+	input()
 
 def menu_cad_fornecedor():
 	while True:
@@ -314,6 +348,6 @@ def novo_fornecedor():
 
 
 # Instancia a tela de login
-load_db()
-security.login(list_usuario)
+#load_db()
+#security.login(list_usuario)
 Main_menu()
