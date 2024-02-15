@@ -7,66 +7,7 @@ from Librarys import (
 	Lib_SQLite3  as sql
 )
 from os import system, getcwd
-
-# Variaveis principais do sistema
-list_fornecedor	= {}	# Armazena a base de dados dos fornecedores
-list_empresa	= {}	# Armazena a base de dados das empresas
-list_users		= {}	# Armazena a base de dados dos usuarios
-
-
-def load_db():
-	# Iniciadno o banco de dados
-	banco_dados = sql.Data_base(f"{getcwd()}\\data.db")
-	# Caso o arquivo não exista
-	if not banco_dados.exist:
-		# Questiona que deve recriar a base de dados
-		confirm = inq.confirm(
-			"Banco de dados não existente.\n  Deseja recrialo?",
-			qmark = "X",
-			style = {"questionmark" : "#ff0000"}
-		)
-		if confirm:
-			# Cria o arquivo
-			banco_dados.connect()
-			
-			# Cria as tabelas
-			banco_dados.create_table( "Users",
-				[ "user_name", "password", "level" ]
-			)
-			banco_dados.create_table( "Empresas",
-				["nome"]
-			)
-			banco_dados.create_table( "Fornecedores",
-				["nome", "nota", "remetente", "motorista"]
-			)
-
-			# Insere dados padões do sistema
-			banco_dados.insert("Users", ['root', 'masterqi'	, 0])
-			banco_dados.insert('Users', ['user', '1234'		, 3])
-		else:
-			# Caso não confirme, o programa fecha.
-			input("O sistema não funciona sem o banco de dados.")
-			exit()
-
-	for item in banco_dados.query('Users'):
-		list_users.update({
-			item[0]: {
-				'password'	: item[1],
-				'level'		: item[2]
-			}
-		})
-	
-	for item in banco_dados.query('Empresas'):
-		add_empresa(item[0])
-	
-	for item in banco_dados.query('Fornecedores'):
-		add_fornecedor(item[0], item[1], item[2], item[3])
-
-load_db()
-
-# Instancia a tela de login
-security.login(list_users)
-
+from time import sleep
 
 
 # Dicionario para o estilo do sistema
@@ -79,6 +20,24 @@ default_style = {
 }
 
 
+# Funções para adicionar
+def add_usuario(nome, password, level):
+	for item in list_usuario:
+		if nome == item:
+			print( "Usuario já cadastrado:	")
+			print(f"Cadastrado: {item}		")
+			print(f"Inserido  : {nome}		")
+			return False
+	
+	banco_dados.insert("Usuarios", [nome, password, level])
+	list_usuario.update({
+		nome: {
+			'password'	: password,
+			'level'		: level
+		}
+	})
+	return True
+
 def add_empresa(nome) -> bool:
 	for item in list_empresa:
 		if nome == item:
@@ -87,6 +46,7 @@ def add_empresa(nome) -> bool:
 			print(f"Inserida  : {nome}		")
 			return False
 
+	banco_dados.insert("Empresas", [nome])
 	list_empresa.update({nome: None	})
 	return True
 
@@ -98,6 +58,7 @@ def add_fornecedor(nome, nota, remetente, motorista):
 			print(f"Inserido  : {nome}			")
 			return False
 	
+	banco_dados.insert('Fornecedores', [nome, nota, remetente, motorista])
 	list_fornecedor.update({
 		nome: {
 			'nota'		: nota,
@@ -106,7 +67,6 @@ def add_fornecedor(nome, nota, remetente, motorista):
 		}
 	})
 	return True
-
 
 
 # Validações:
@@ -124,7 +84,71 @@ def valid_empresa(name_answer):
 	if name_answer in list_empresa: return False
 	else: return True
 
+
+# Variaveis principais do sistema
+list_fornecedor	= {}	# Armazena a base de dados dos fornecedores
+list_empresa	= {}	# Armazena a base de dados das empresas
+list_usuario	= {}	# Armazena a base de dados dos usuarios
+
+# Sistema que carrega o banco de dados
+def load_db() -> sql.Data_base:
+	# Iniciadno o banco de dados
+	banco_dados = sql.Data_base(f"{getcwd()}\\data.db")
+	# Caso o arquivo não exista
+	if not banco_dados.exist:
+		# Questiona que deve recriar a base de dados
+		confirm = inq.confirm(
+			"Banco de dados não existente.\n  Deseja recrialo?",
+			qmark = "X",
+			style = {"questionmark" : "#ff0000"}
+		)
+		if confirm:
+			# Cria o arquivo
+			banco_dados.connect()
+			
+			# Cria as tabelas
+			banco_dados.create_table( "Usuarios",
+				[ "user_name", "password", "level" ]
+			)
+			
+			banco_dados.create_table("Empresas",
+				["nome"]
+			)
+			banco_dados.create_table( "Fornecedores",
+				["nome", "nota", "remetente", "motorista"]
+			)
+
+			# Insere dados padões do sistema
+			banco_dados.insert("Usuarios", ['root', 'masterqi'	, 0])
+			banco_dados.insert('Usuarios', ['user', '1234'		, 3])
+		else:
+			# Caso não confirme, o programa fecha.
+			input("O sistema não funciona sem o banco de dados.")
+			exit()
+
+	for item in banco_dados.query('Usuarios'):
+		list_usuario.update({
+			item[0]: {
+				'password'	: item[1],
+				'level'		: item[2]
+			}
+		})
 	
+	for item in banco_dados.query('Empresas'):
+		list_empresa.update({item[0]: None	})
+	
+	for item in banco_dados.query('Fornecedores'):
+		list_fornecedor.update({
+			item[0]: {
+				'nota'		: item[1],
+				'remetente'	: item[2],
+				'motorista'	: item[3],
+			}
+		})
+
+	return banco_dados
+banco_dados		= load_db()
+
 
 # Menus
 def Main_menu():
@@ -140,6 +164,7 @@ def Main_menu():
 
 		match option:
 			case "cad":	menu_cadastro()
+			case 	0 : exit()
 
 # Menu de cadastros gerais
 def menu_cadastro():
@@ -148,13 +173,16 @@ def menu_cadastro():
 		option = inq.menu(
 			"Cadastros",
 			[	(	"emp"	, "Empresa"			),
+				(	"for"	, "Fornecedor"		),
 				inq.separator(					),
 				(	0		, "Voltar"			),
 			], style = default_style
 		)
 		match option:
 			case "emp":	menu_cad_empresa()
+			case "for": menu_cad_fornecedor()
 			case 	0 : break
+
 
 
 def menu_cad_empresa():
@@ -163,14 +191,15 @@ def menu_cad_empresa():
 		option = inq.menu(
 			"Cadastro de Empresa",
 			[	(	"nova"	, "Nova"			),
-				(	"List"	, "Listar"			),
+				(	"list"	, "Listar"			),
 				inq.separator(					),
 				(	0		, "Voltar"			),
 			], style = default_style
 		)
 		match option:
-			case "emp":	
-			case 	0 : break
+			case "nova": nova_empresa()
+			case "list": input(list_empresa)				# <- Criar uma função para isso.
+			case 	0  : break
 
 def nova_empresa():
 	text_nome = "Nome da empresa"
@@ -197,7 +226,94 @@ def nova_empresa():
 				system('cls')
 				print(text_nome)
 				if inq.confirm('Confirmar as informações acima?', "s"):
-					list_empresa.update({})
+					if add_empresa(nome):
+						print("Empresa cadastrada.")
+						sleep(2)
+						break
+					else: 
+						print("Erro ao cadastrar empresa.")
+						sleep(2)
+
 			case 	0 : break
 
 
+
+def menu_cad_fornecedor():
+	while True:
+		system('cls')
+		option = inq.menu(
+			"Cadastro de Fornecedor",
+			[	(	"novo"	, "Novo"			),
+				(	"list"	, "Listar"			),
+				inq.separator(					),
+				(	0		, "Voltar"			),
+			], style = default_style
+		)
+		match option:
+			case "novo": novo_fornecedor()
+			case "list": input(list_fornecedor)				# <- Criar uma função para isso.
+			case 	0  : break
+
+def novo_fornecedor():
+	text_nome = "Nome do fornecedor"
+	text_nota = "Nome na nota"
+	text_reme = "Remetente"
+	text_moto = "Nome do motorista"
+	while True:
+		system('cls')
+		option = inq.menu(
+			"Cadastro de Fornecedor",
+			[	(	"nome"	, text_nome			),
+				(	"nota"	, text_nota			),
+				(	"reme"	, text_reme			),
+				(	"moto"	, text_moto			),
+				inq.separator(					),
+				(	1		, "Confirmar"		),
+				(	0		, "Voltar"			),
+			], style = default_style
+		)
+		match option:
+			case "nome": 
+				nome = inq.entry(
+					text_nome,
+					validate 		= valid_fornecedor,
+					invalid_message = "Fornecedor já cadastrado."
+				)
+				text_nome = f"Nome     : {nome}"
+			
+			case "nota": 
+				nota = inq.entry( text_nota )
+				text_nota = f"nota     : {nota}"
+			
+			case "reme": 
+				reme = inq.entry( text_reme )
+				text_reme = f"Remetente: {reme}"
+			
+			case "moto": 
+				moto = inq.entry( text_moto )
+				text_moto = f"Motorista: {moto}"
+			
+			case	1 : 
+				system('cls')
+				print(text_nome)
+				print(text_nota)
+				print(text_reme)
+				print(text_moto)
+				if inq.confirm('Confirmar as informações acima?', "s"):
+					if add_fornecedor(nome, nota, reme, moto):
+						print("Fornecedor cadastrado.")
+						sleep(2)
+						break
+					else: 
+						print("Erro ao cadastrar Fornecedor.")
+						sleep(2)
+
+			case 	0 : break
+
+
+
+
+# Instancia a tela de login
+load_db()
+security.login(list_usuario)
+Main_menu()

@@ -27,9 +27,10 @@ class Data_base():
 		\n Function for internal use of the object
 		\n Updates the list of table names
 		"""
-		select_sql = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchone()
-		if select_sql != None:	
+		select_sql = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+		if len(select_sql) > 0:
 			for table in select_sql:
+				table = table[0]
 				table_columns = []
 				for column in cursor.execute(f'SELECT * FROM {table}').description:
 					table_columns.append(column[0])
@@ -73,7 +74,7 @@ class Data_base():
 		for value in values:
 			if	 type(value) == type(1)		:	str_values += f"{value}, "
 			elif type(value) == type("str")	:	str_values += f"'{value.replace(' ', '_')}', "
-		str_values = str_values[:-2]
+		str_values = str_values.removesuffix(', ')
 
 		insert_scheme = f"INSERT INTO {table} ({columns}) VALUES ({str_values})"
 		try:
