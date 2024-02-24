@@ -1,72 +1,126 @@
-from os import system
-from Librarys import (
-	Lib_Inquirer as inq,
-	Lib_SQLite3  as sql
-)
-from InquirerPy.separator import Separator
+# Base: https://github.com/magmax/python-inquirer/tree/main/examples
 
-print(type(inq.separator()))
-print(type(inq.separator))
-print(type(Separator))
-input()
+from InquirerPy                 import inquirer, get_style
+from InquirerPy.base.control    import Choice
+from InquirerPy.separator       import Separator
+from InquirerPy.utils           import InquirerPyStyle
 
 
+class Style():
+    """ Simplifies `InqueirerPY's` styling system """
+    
+    # Notas:
+    '"questionmark": "fg:#e5c07b bg:#ffffff underline bold"'
+    # https://inquirerpy.readthedocs.io/en/latest/pages/style.html
 
-def menu_cadastro():
-	input("cadastro")
+    def __init__(self) -> None:
+        """ Instantiate the variables """
+        self.questionmark       = "#e5c07b"
+        self.answermark         = "#e5c07b"
+        self.answer             = "#61afef"
+        self.input              = "#98c379"
+        self.question           = ""
+        self.answered_question  = ""
+        self.instruction        = "#abb2bf"
+        self.long_instruction   = "#abb2bf"
+        self.pointer            = "#61afef"
+        self.checkbox           = "#98c379"
+        self.separator          = ""
+        self.skipped            = "#5c6370"
+        self.validator          = ""
+        self.marker             = "#e5c07b"
+        self.fuzzy_prompt       = "#c678dd"
+        self.fuzzy_info         = "#abb2bf"
+        self.fuzzy_border       = "#4b5263"
+        self.fuzzy_match        = "#c678dd"
+        self.spinner_pattern    = "#e5c07b"
+        self.spinner_text       = ""
+
+    def __call__(self) -> InquirerPyStyle:
+        """ Returns the style according to the object variables """
+
+        style = {
+            "questionmark"      : self.question             ,
+            "answermark"        : self.answermark           ,
+            "answer"            : self.answer               ,
+            "input"             : self.input                ,
+            "question"          : self.question             ,
+            "answered_question" : self.answered_question    ,
+            "instruction"       : self.instruction          ,
+            "long_instruction"  : self.long_instruction     ,
+            "pointer"           : self.pointer              ,
+            "checkbox"          : self.checkbox             ,
+            "separator"         : self.separator            ,
+            "skipped"           : self.skipped              ,
+            "validator"         : self.validator            ,
+            "marker"            : self.marker               ,
+            "fuzzy_prompt"      : self.fuzzy_prompt         ,
+            "fuzzy_info"        : self.fuzzy_info           ,
+            "fuzzy_border"      : self.fuzzy_border         ,
+            "fuzzy_match"       : self.fuzzy_match          ,
+            "spinner_pattern"   : self.spinner_pattern      ,
+            "spinner_text"      : self.spinner_text         ,
+        }
+        return get_style(style, False)
 
 
+def menu(
+        message             : str                               ,
+        
+        options             : list[str]                         ,
+        border              : bool          = False             ,
+        
+        style               : Style         = None              ,
+        
+        qmark               : str           = "#"               ,
+        pointer             : str           = ">"               ,
+        
+        instruction         : str           = ""                ,
+        long_instruction    : str           = ""                ,
+        
+        key_binds           : dict | None   = None              ,
+        
+        mandatory           : bool          = True              ,
+        mandatory_message   : str           = "Mandatory Menu"  ,
+    ) -> int:
 
-def base_menu(message:str, buttons:list[str, type]) -> None:
-	_choices = []
-	_index = 0
-	for _item in buttons:
-		if   type(_item) == Separator:	_choices.append(_item)
-		elif type(_item) == tuple:
-			_index += 1
-			_choices.append((_index, _item[0]))
+    """ Show a menu with the options passed and returns the index of the option in the list.
+        
+        `message`	| :class:`Str`
+            Menu title, message that will be written above the menu.
+        `options`	| :class:`list` [ Str , ... ]
+            Options listed in the menu, buttons.				
+        `style`		| :class:`dict` { Style }
+            Menu color style.
+        `qmark`     | :class:`str`
+            menu message/title marker, shown to the left of them.
+    """
 
-	while True:
-		system("cls")
-		_option = inq.menu(message, _choices)
-		for _item in buttons:
-			
-			if type(_item) != Separator:
-				if _option == _item[0]:
-					_item[2]()
+    _menu_options = []
+    _index = 0
+    for _item in options:
+        _item = _item.lower()
 
-
-base_menu(
-		"Main Menu",
-		[	(1, "Cadastros", menu_cadastro),
-			inq.separator(                ),
-			(2, "Teste", exit)
-		]
-	)
-
-
-"""def cadastro():
-	input("Cadastro")
-
-def test():
-	input("teste")
-
-def menu(message, buttons):
-	choices = []
-	for item in buttons:
-		choices.append((item[0], item[1]))
-	while True:
-		system("cls")
-		option = inq.menu(message, choices)
-		for item in buttons:
-			if option == item[0]:
-				item[2]()
+        if 	 _item in ("separator"):
+            _menu_options.append(Separator())
+        
+        else:
+            _menu_options.append(Choice(_index, _item))
+        
+        _index += 1
+    
+    return inquirer.select(
+        message             = message                ,
+        choices             = _menu_options          ,
+        keybindings         = key_binds              ,
+        style               = get_style(style, False),
+        qmark               = qmark                  ,
+        instruction         = instruction            ,
+        long_instruction    = long_instruction       ,
+        mandatory           = mandatory              ,
+        mandatory_message   = mandatory_message      ,
+        border              = border                 ,
+        pointer             = pointer                ,
+    ).execute()
 
 
-
-menu("teste", [
-	("cad", "Cadastros", cadastro),
-	("tes", "Teste", test)
-]
-)
-"""

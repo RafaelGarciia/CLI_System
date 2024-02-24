@@ -39,7 +39,15 @@ def add_empresa(nome) -> bool:
 
 	banco_dados.insert("Empresas", [nome])
 	list_empresa.update({nome: None	})
+	print("Empresa cadastrada com sucesso !")
+	sleep(2)
 	return True
+
+def del_empresa(nome) -> bool:
+	if banco_dados.delete("Empresas", 'nome', nome):
+		list_empresa.pop(nome)
+	else:
+		print("erro")
 
 def add_fornecedor(nome, nota, remetente, motorista):
 	for item in list_fornecedor:
@@ -57,6 +65,8 @@ def add_fornecedor(nome, nota, remetente, motorista):
 			'motorista'	: motorista,
 		}
 	})
+	print("Fornecedor cadastrado com sucesso !")
+	sleep(2)
 	return True
 
 
@@ -116,6 +126,11 @@ def load_db() -> sql.Data_base:
 			input("O sistema não funciona sem o banco de dados.")
 			exit()
 
+	# Retorna o objeto banco para ser utilizado nos cadastros
+	return banco_dados
+banco_dados		= load_db()
+
+def atualizar_db():
 	# Carrega as variaveis principais com os dados do banco de dados
 	for item in banco_dados.query('Usuarios'):
 		list_usuario.update({
@@ -136,14 +151,7 @@ def load_db() -> sql.Data_base:
 				'motorista'	: item[3],
 			}
 		})
-
-	# Retorna o objeto banco para ser utilizado nos cadastros
-	return banco_dados
-banco_dados		= load_db()
-
-
-
-
+atualizar_db()
 
 def base_menu(message:str, buttons:list[str, type]) -> None:
 	_choices = []
@@ -169,7 +177,39 @@ def base_menu(message:str, buttons:list[str, type]) -> None:
 		if comand == "break":	break
 		else:	comand()
 	
+def menu_entry(message:str, entry_list:list, confirm_button:str = "Confirm", back_button:str = "Back"):
+	_choices = []
+	_exit_list = []
+	_index = 0
+	for _item in entry_list:
+		if type(_item) == type(inq.separator()):
+			_choices.append(_item)
+			_exit_list.append("")
+		elif type(_item) == tuple:
+			_choices.append([_index, f"{_item[0]:>10}: --"])
+			_exit_list.append("")
+		_index += 1
+	
+	_choices.append(inq.separator())
+	_choices.append(["ok", confirm_button])
+	_choices.append(["bk", back_button])
 
+	while True:
+		system("cls")
+		_option = inq.menu(message, _choices)
+
+		if _option == "bk":	return False
+		elif _option == "ok":
+			return _exit_list
+		else:
+			entry = entry_list[_option]
+			if entry[1] == None:
+				insert = inq.entry(entry[0])
+			else:
+				insert = inq.entry(entry[0], entry[1], entry[2])
+
+		_choices[_option][1] = f"{entry[0]:>10}: {insert}"
+		_exit_list[_option] = insert
 
 # Menus
 def Main_menu():	# Menu principal
@@ -186,7 +226,7 @@ def menu_cadastro():	# Menu de cadastros gerais
 	base_menu(
 		"Cadastros",
 		[	("Empresa"		, menu_cad_empresa		),
-			("Fornecedor"	, menu_cad_fornecedor	),
+			#("Fornecedor"	, menu_cad_fornecedor	),
 			inq.separator(							),
 			("Voltar"		, "break"				),
 
@@ -200,78 +240,36 @@ def menu_cad_empresa():
 		"Cadastros",
 		[	("Nova"		, nova_empresa				),
 			("Listar"	, listar_empresa			),
+			("Deletar"	, deletar_empresa			),
 			inq.separator(							),
 			("Voltar"		, "break"				),
 		]
 	)
 
-
 def nova_empresa():
-	text_name = "Nome"
-	base_menu(
+	_returno = menu_entry(
 		"Cadastro de Empresa",
-		[	(text_name, entry_nome	),
-			inq.separator(			),
-			("Confirmar", )
-
-		]
+		[("Nome", valid_empresa, "Empresa já cadastrada")]
 	)
 
-def entry_nome(text_nome):
-	nome = inq.entry(
-		text_nome,
-		validate=valid_empresa,
-		invalid_message= "Empresa já cadastrada."
-	)
-	return f"Nome: {nome}"
-
-
-	text_nome = "Nome da empresa"
-	while True:
-		system('cls')
-		option = inq.menu(
-			"Cadastro de Empresa",
-			[	(	"nome"	, text_nome			),
-				inq.separator(					),
-				(	1		, "Confirmar"		),
-				(	0		, "Voltar"			),
-			], style = default_style
-		)
-
-
-
-		match option:
-			case "nome": 
-				nome = inq.entry(
-					text_nome,
-					validate 		= valid_empresa,
-					invalid_message = "Empresa já cadastrada."
-				)
-				text_nome = f"Nome: {nome}"
-
-def confirm_empresa(text_name):
-	system('cls')
-	print()
-
-			case	1 : 
-				system('cls')
-				print(text_nome)
-				if inq.confirm('Confirmar as informações acima?', "s"):
-					if add_empresa(nome):
-						print("Empresa cadastrada.")
-						sleep(2)
-						break
-					else: 
-						print("Erro ao cadastrar empresa.")
-						sleep(2)
-
-			case 	0 : break
+	if _returno != False:
+		add_empresa(_returno[0])
 
 def listar_empresa():
 	for item in list_empresa:
 		print(item)
 	input()
 
+def deletar_empresa():
+	emp_select = ""
+	
+	_choices = []
+	for item in list_empresa:
+		_choices.append((item, ))
+	base_menu("Deletar empresa", _choices)
+
+
+"""
 def menu_cad_fornecedor():
 	while True:
 		system('cls')
@@ -344,7 +342,7 @@ def novo_fornecedor():
 
 			case 	0 : break
 
-
+"""
 
 
 # Instancia a tela de login

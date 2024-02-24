@@ -35,11 +35,13 @@ def menu(
 	
 	# Defines choices
 	_menu_choices = []
-	for item in buttons:
-		if type(item) not in (tuple, list):
-			_menu_choices.append(item)
+	_index = 0
+	for _item in buttons:
+		if type(_item) not in (tuple, list):
+			_menu_choices.append(_item)
 		else:
-			_menu_choices.append(Choice(item[0], item[1]))
+			_menu_choices.append(Choice(_index, _item[0]))
+		_index += 1
 	
 	# The Menu in inquirer.select
 	_option = inquirer.select(
