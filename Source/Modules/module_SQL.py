@@ -24,3 +24,5 @@ class Sql_Data_Base(sql.Data_base):
 				self.insert("Users", ["root", "masterqi", 0])
 				self.insert("Users", ["hero", "3232", 1])
 
+	def load(self):
+		self.query()
