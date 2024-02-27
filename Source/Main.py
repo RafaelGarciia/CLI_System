@@ -5,24 +5,30 @@ from Librarys import (
 from os import getcwd
 from functools import partial
 
-"# ----- Database system variables ----- #"
-list_supplier   :dict   = {}    # Supplier database
-
-list_company    :dict   = {}    # Company database
-
+"V ----- Database system variables ----- V"
+list_supplier   :dict   = {}
+"List that stores the company database"
+list_company    :dict   = {}
+"List that stores the company database"
 list_users      :dict   = {}
-"Lista que armazena o banco de dados de usuarios"
+"List that stores the user database"
 
 
-"# ----- Database functions ----- #"
+"V ----- Database functions ----- V"
+
 # Instantiating the database
 data_base = sql.Data_base(f"{getcwd()}\\data.db")
+"Variable that stores the database instance"
+
+# In case it doesn't exist
 if not data_base.exist:
+    # Asks whether to recreate the database
     if inq.confirm(
         "Data base does't exist. \nDo you want to recreate the DataBase?",
         qmark = "X",
         style = {"questionmark" : "#ff0000"}
     ):
+        # If yes, recreate the database
         data_base.connect()
         data_base.create_table(
             "User",
@@ -40,6 +46,7 @@ if not data_base.exist:
         data_base.insert("User", ['root', 'masterqi'   , 0])
         data_base.insert("User", ['user', '1234'       , 3])
     else:
+        # Else, informs that the system will be closed and exit
         inq.entry(
             "The system does't work without the Database. \nthe system will be closed",
             qmark = "X",
@@ -47,10 +54,15 @@ if not data_base.exist:
         )
         exit()
 else:
+    # If it exists, it just instantiates the database
     data_base.connect()
 
 
+
+
 def load_db():
+    "Loads the database into memory"
+
     for _item in data_base.query("User"):
         list_users.update({
             _item[0]:{
@@ -75,9 +87,11 @@ def load_db():
 load_db()
 
 
+"V ----- Decorators for validation ----- V"
 
-def in_database(function):
-    def valid(name_base:str, parameter:list):
+def in_database(function) -> callable:
+    "Checks if the parameter is in the database"
+    def valid(name_base:str, parameter:list) -> callable:
         database = {
             "User"      : list_users,
             "Company"   : list_company,
@@ -100,6 +114,7 @@ def in_database(function):
     return valid
 
 def not_in_database(function):
+    "Checks if the parameter is not in database"
     def valid(name_base:dict, parameter):
         database = {
             "User"      : list_users,
@@ -123,8 +138,12 @@ def not_in_database(function):
     return valid
 
 
+"V ----- Interact database ----- V"
+# funcions that interact with the database
+
 @not_in_database
 def add(name_base:str, info:list):
+    "Adds data to the database if it doesn t exist"
     data_base.insert(name_base, info)
     inq.entry(
         f"{name_base} registered successfully !",
@@ -137,6 +156,7 @@ def add(name_base:str, info:list):
 
 @in_database
 def dell(name_base:str, info:list):
+    "Delete data from the database if it exists"
     data_base.delete(name_base, "name", info[0])
     inq.entry(
         f"{name_base} successfully deleted !",
