@@ -1,9 +1,10 @@
-from Librarys import (
+from Librarys  import (
     Lib_SQLite3  as sql,
     Lib_Inquirer as inq
 )
-from os import getcwd
+from os        import getcwd
 from functools import partial
+
 
 "V ----- Database system variables ----- V"
 list_supplier   :dict   = {}
@@ -56,8 +57,6 @@ if not data_base.exist:
 else:
     # If it exists, it just instantiates the database
     data_base.connect()
-
-
 
 
 def load_db():
@@ -166,4 +165,13 @@ def dell(name_base:str, info:list):
             "answermark"    : "#008000"
         }
     )
+
+
+add_company   = partial(add  , "Company" )
+add_user      = partial(add  , "User"    )
+add_supplier  = partial(add  , "Supplier")
+dell_company  = partial(dell , "Company" )
+dell_user     = partial(dell , "User"    )
+dell_supplier = partial(dell , "Supplier")
+
 
