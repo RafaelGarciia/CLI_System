@@ -5,11 +5,17 @@ from Librarys import (
 from os import getcwd
 
 
-# Main system variables
-list_supplier   = {}    # Supplier database
-list_company    = {}    # Company database
-list_users      = {}    # Users database
+"# ----- Database system variables ----- #"
+list_supplier   :dict   = {}    # Supplier database
 
+list_company    :dict   = {}    # Company database
+
+list_users      :dict   = {}
+"Lista que armazena o banco de dados de usuarios"
+
+
+"# ----- Database functions ----- #"
+# Instantiating the database
 data_base = sql.Data_base(f"{getcwd()}\\data.db")
 if not data_base.exist:
     if inq.confirm(
@@ -171,3 +177,57 @@ def dell(table_name:str, info:list):
         }
     )
     return False
+
+
+def in_database(table, info, not_in:bool):
+    def valid(_function, table, info) -> callable:
+        match table:
+            case "User"     : _table = list_users
+            case "Company"  : _table = list_company
+            case "Supplier" : _table = list_supplier
+
+        in_db = False
+        for item in _table:
+            if info[0] == item:
+                in_db = True
+                break
+        
+        if not_in:
+            if in_db:
+                return inq.entry(
+                    f"{table} already registered !",
+                    qmark = "X",
+                    style = {
+                        "questionmark"  : "#900020",
+                        "answermark"    : "#900020"
+                    }
+                )
+            else:
+                return _function(_table, info)
+        else:
+            if in_db:
+                return _function(_table, info)
+            else:
+                return inq.entry(
+                    f"Unregistered {table} !",
+                    qmark = "X",
+                    style = {
+                        "questionmark"  : "#900020",
+                        "answermark"    : "#900020"
+                    }
+                )
+    
+    return valid
+
+
+load_db()
+@in_database(False)
+def add_new(table, info):
+    print(table)
+    print(info)
+    input()
+    #data_base.insert(table, info)
+
+
+
+add_new("User", ["ot"])
