@@ -1,9 +1,27 @@
-# Base: https://github.com/magmax/python-inquirer/tree/main/examples
+# pip3 install InquirerPY
+
+""" Links
+        https://inquirerpy.readthedocs.io/en/latest/index.html
+        https://github.com/magmax/python-inquirer/tree/main/examples
+
+    Auto Complite Example:
+        {"python":{
+            "esta":{
+                "presente aqui": None
+            },
+            "é":{
+                "minha linguagem favorita": None
+            }
+        }}
+"""
 
 from InquirerPy                 import inquirer, get_style
 from InquirerPy.base.control    import Choice
 from InquirerPy.separator       import Separator
 from InquirerPy.utils           import InquirerPyStyle
+from InquirerPy.validator       import PathValidator
+
+from os import name as os_name
 
 
 class Style():
@@ -130,6 +148,7 @@ def entry(
         validate            : str | None    = None              ,
         invalid_message     : str           = "Invalid Input"   ,
         is_password         : bool          = False             ,
+        auto_complet        : dict | None   = None              ,
         
         style               : Style | None  = None              ,
 
@@ -199,4 +218,50 @@ def confirm(
 		keybindings			= key_binds,
 		mandatory			= mandatory,
 		mandatory_message	= mandatory_message
+    ).execute()
+
+
+def filepath(
+        message             : str                               ,
+
+        dir_only            : bool          = False             ,
+        file_only           : bool          = False             ,
+
+        valid_is_file       : bool          = False             ,
+        valid_is_dir        : bool          = False             ,
+
+        default             : str
+            = "~/" if os_name == "poxix" else "C:\\"            ,
+
+        style               : Style | None  = None              ,
+
+        qmark               : str           = ">"               ,
+        amark               : str           = "|"               ,
+
+        instruction         : str           = ""                ,
+        long_instruction    : str           = ""                ,
+
+    ):
+
+    if valid_is_file and valid_is_dir:
+        print("filepath: Both options cannot be active at the same time")
+        return False
+
+    if  valid_is_file: valid_message = "This is not a valid file"
+    elif valid_is_dir: valid_message = "This is not a valid path"
+    else: valid_message = "Invalid"
+
+    validate = PathValidator(valid_message, valid_is_file, valid_is_dir)
+
+    return inquirer.filepath(
+        message             = message,
+        only_directories    = dir_only,
+        only_files          = file_only,
+        validate            = validate,
+        qmark				= qmark,
+		amark				= amark,
+        default             = default,
+        style               = get_style(style, False),
+        instruction			= instruction,
+		long_instruction	= long_instruction,
     ).execute()
