@@ -3,7 +3,7 @@ from Librarys import (
     Lib_Inquirer as inq
 )
 from os import getcwd
-
+from functools import partial
 
 "# ----- Database system variables ----- #"
 list_supplier   :dict   = {}    # Supplier database
@@ -72,162 +72,78 @@ def load_db():
                 'driver'    : _item[3]
             }
         })
+load_db()
 
 
-def add(table_name:str, info:list):
-    """
-    Infos:
-        `User`    : "name", "note", "sender", "driver"  \n
-        `Company` : "name"                              \n
-        `Supplier`: "name", "note", "sender", "driver"  \n
-        \n
-        Exemple: add("Company", ["My company name"])
-    """
 
-    match table_name:
-        case "User"     : _table = list_users
-        case "Company"  : _table = list_company
-        case "Supplier" : _table = list_supplier
-
-    load_db()
-    for _item in _table:
-        if info[0] == _item:
-            inq.entry(
-                f"{table_name} already registered !",
+def in_database(function):
+    def valid(name_base:str, parameter:list):
+        database = {
+            "User"      : list_users,
+            "Company"   : list_company,
+            "Supplier"  : list_supplier,
+        }
+        
+        if parameter[0] in database[name_base]:
+            return function(name_base, parameter)
+        
+        else:
+            return inq.entry(
+                f"Unregistered {name_base} !",
                 qmark = "X",
                 style = {
                     "questionmark"  : "#900020",
                     "answermark"    : "#900020"
                 }
             )
-            return False
-
-    valid = data_base.insert(table_name, info)
-    load_db()
-
-    if valid:
-        inq.entry(
-            f"{table_name} registered successfully !",
-            qmark = "@",
-            style = {
-                "questionmark"  : "#008000",
-                "answermark"    : "#008000"
-            }
-        )
-        return True
-    else:
-        inq.entry(
-            f"Unregistered {table_name} !",
-            qmark = "X",
-            style = {
-                "questionmark"  : "#900020",
-                "answermark"    : "#900020"
-            }
-        )
-        return False
-
-
-def dell(table_name:str, info:list):
-    """
-    Infos:
-        `User`    : "name", "note", "sender", "driver"  \n
-        `Company` : "name"                              \n
-        `Supplier`: "name", "note", "sender", "driver"  \n
-        \n
-        Exemple: dell("Company", ["My company name"])
-    """
-    match table_name:
-        case "User"     : _table = list_users
-        case "Company"  : _table = list_company
-        case "Supplier" : _table = list_supplier
-    
-    load_db()
-    for _item in _table:
-        if info[0] == _item:
-            valid = data_base.delete(table_name, "name", info[0])
-            load_db()
-
-            if valid:
-                inq.entry(
-                    f"{table_name} successfully deleted !",
-                    qmark = "@",
-                    style = {
-                        "questionmark"  : "#008000",
-                        "answermark"    : "#008000"
-                    }
-                )
-                return True
-            else:
-                inq.entry(
-                    f"Unregistered {table_name} !",
-                    qmark = "X",
-                    style = {
-                        "questionmark"  : "#900020",
-                        "answermark"    : "#900020"
-                    }
-                )
-                return False
-    
-    inq.entry(
-        f"Unregistered {table_name} !",
-        qmark = "X",
-        style = {
-            "questionmark"  : "#900020",
-            "answermark"    : "#900020"
-        }
-    )
-    return False
-
-
-def in_database(table, info, not_in:bool):
-    def valid(_function, table, info) -> callable:
-        match table:
-            case "User"     : _table = list_users
-            case "Company"  : _table = list_company
-            case "Supplier" : _table = list_supplier
-
-        in_db = False
-        for item in _table:
-            if info[0] == item:
-                in_db = True
-                break
-        
-        if not_in:
-            if in_db:
-                return inq.entry(
-                    f"{table} already registered !",
-                    qmark = "X",
-                    style = {
-                        "questionmark"  : "#900020",
-                        "answermark"    : "#900020"
-                    }
-                )
-            else:
-                return _function(_table, info)
-        else:
-            if in_db:
-                return _function(_table, info)
-            else:
-                return inq.entry(
-                    f"Unregistered {table} !",
-                    qmark = "X",
-                    style = {
-                        "questionmark"  : "#900020",
-                        "answermark"    : "#900020"
-                    }
-                )
     
     return valid
 
+def not_in_database(function):
+    def valid(name_base:dict, parameter):
+        database = {
+            "User"      : list_users,
+            "Company"   : list_company,
+            "Supplier"  : list_supplier,
+        }
 
-load_db()
-@in_database(False)
-def add_new(table, info):
-    print(table)
-    print(info)
-    input()
-    #data_base.insert(table, info)
+        if parameter[0] not in database[name_base]:
+            return function(name_base, parameter)
+        
+        else:
+            return inq.entry(
+                f"{name_base} already registered !",
+                qmark = "X",
+                style = {
+                    "questionmark"  : "#900020",
+                    "answermark"    : "#900020"
+                }
+            )
+
+    return valid
 
 
+@not_in_database
+def add(name_base:str, info:list):
+    data_base.insert(name_base, info)
+    inq.entry(
+        f"{name_base} registered successfully !",
+        qmark = "@",
+        style = {
+            "questionmark"  : "#008000",
+            "answermark"    : "#008000"
+        }
+    )
 
-add_new("User", ["ot"])
+@in_database
+def dell(name_base:str, info:list):
+    data_base.delete(name_base, "name", info[0])
+    inq.entry(
+        f"{name_base} successfully deleted !",
+        qmark = "@",
+        style = {
+            "questionmark"  : "#008000",
+            "answermark"    : "#008000"
+        }
+    )
+
