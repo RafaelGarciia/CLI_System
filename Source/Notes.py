@@ -1,4 +1,16 @@
-
+# Links
+#   https://inquirerpy.readthedocs.io/en/latest/index.html
+#   https://github.com/magmax/python-inquirer/tree/main/examples
+#
+# Auto Complite example:
+#   {"python":{
+#        "esta":{
+#            "presente aqui": None
+#        },
+#        "é":{
+#            "minha linguagem favorita": None
+#        }
+#   }}
 
 STYLES = [
 	{	# underline, italic, bold, reverse, hidden, blink

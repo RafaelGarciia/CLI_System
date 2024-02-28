@@ -1,18 +1,18 @@
 # pip3 install InquirerPY
 
-""" Links
-        https://inquirerpy.readthedocs.io/en/latest/index.html
-        https://github.com/magmax/python-inquirer/tree/main/examples
+# __DOC__
+""" 
+    A small adaptation of the InquirerPY library.       \n
+    `! To use this library, install the inquirer lib !` \n
+    \t pip install InquirerPY                           \n
 
-    Auto Complite Example:
-        {"python":{
-            "esta":{
-                "presente aqui": None
-            },
-            "é":{
-                "minha linguagem favorita": None
-            }
-        }}
+    `Style()`   : A class to simplify inquirer style creation.
+    `menu()`    : Simple menu for selecting options.
+    `entry()`   : Stylized input with inquirer.
+    `confirm()` : Generic and stylized confirmation message.
+    \n\n
+    `filepath()`: Still in development.
+
 """
 
 from InquirerPy                 import inquirer, get_style

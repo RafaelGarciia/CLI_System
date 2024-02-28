@@ -6,16 +6,19 @@ from os        import getcwd
 from functools import partial
 
 
-"V ----- Database system variables ----- V"
+"V --------------- Database system variables --------------- V"
+
 list_supplier   :dict   = {}
 "List that stores the company database"
+
 list_company    :dict   = {}
 "List that stores the company database"
+
 list_users      :dict   = {}
 "List that stores the user database"
 
 
-"V ----- Database functions ----- V"
+"V ------------------ Database functions ------------------- V"
 
 # Instantiating the database
 data_base = sql.Data_base(f"{getcwd()}\\data.db")
@@ -58,7 +61,6 @@ else:
     # If it exists, it just instantiates the database
     data_base.connect()
 
-
 def load_db():
     "Loads the database into memory"
 
@@ -86,7 +88,7 @@ def load_db():
 load_db()
 
 
-"V ----- Decorators for validation ----- V"
+"V --------------- Decorators for validation --------------- V"
 
 def in_database(function) -> callable:
     "Checks if the parameter is in the database"
@@ -137,7 +139,7 @@ def not_in_database(function):
     return valid
 
 
-"V ----- Interact database ----- V"
+"V ------------------- Interact database ------------------- V"
 # funcions that interact with the database
 
 @not_in_database
@@ -167,11 +169,30 @@ def dell(name_base:str, info:list):
     )
 
 
+"V ------------------- Interface database ------------------ V"
+
 add_company   = partial(add  , "Company" )
+""" Partial to add a Company to the database.\n
+    add_company( list["Company name"] )                     """
+
 add_user      = partial(add  , "User"    )
+""" Partial to add a User to the database.\n
+    add_user( list["User_name", "password", "level"] )      """
+
 add_supplier  = partial(add  , "Supplier")
+""" Partial to add a Supplier to the database.\n
+    add_supplier( list["Name", "Note", "Sender", "Driver"] )"""
+
 dell_company  = partial(dell , "Company" )
+""" Partial to delete a Company to the database.\n
+    dell_company( list["Company name"] )                    """
+
 dell_user     = partial(dell , "User"    )
+""" Partial to delete a User to the database.\n
+    dell_user( list["User name"] )                          """
+
 dell_supplier = partial(dell , "Supplier")
+""" Partial to delete a Supplier to the database.\n
+    dell_user( list["Supplier name"] )                      """
 
-
+"^ --------------------------------------------------------- ^"
