@@ -82,6 +82,11 @@ class Style():
         return get_style(style, False)
 
 
+    
+
+
+
+
 def menu(
         message             : str                               ,
         
@@ -115,13 +120,15 @@ def menu(
     """
 
     _menu_options = []
-    _index = 0
+    _index = 1
     for _item in options:
         _item = _item.lower()
 
-        if 	 _item in ("separator"):
+        if   _item in ("separator"):
             _menu_options.append(Separator())
-        
+        elif _item in ("sair", "exit", "quit", "back", "voltar"):
+            _menu_options.append(Choice(0, _item))
+
         else:
             _menu_options.append(Choice(_index, _item))
         

@@ -2,7 +2,7 @@ from Librarys  import (
     Lib_SQLite3  as sql,
     Lib_Inquirer as inq
 )
-from os        import getcwd
+from os        import getcwd, system
 from functools import partial
 
 
@@ -196,3 +196,41 @@ dell_supplier = partial(dell , "Supplier")
     dell_user( list["Supplier name"] )                      """
 
 "^ --------------------------------------------------------- ^"
+
+
+
+def main_menu():
+
+    _opt = inq.menu(
+        "Main menu",
+        ["Register", "Exit"]
+    )
+    
+    match _opt:
+        case 0: # Exit
+            exit()
+
+        case 1: # Register
+            registration_menu()
+        
+def registration_menu():
+    while True:
+        match inq.menu(
+            "Registration",
+            ["Company", "Supplier", "separator", "Back"]
+        ):
+            case 0: break
+            case 1: menu_company_reg()
+            case 2: ...
+
+def menu_company_reg():
+    while True:
+        match inq.menu(
+            "Company registration",
+            ["New", "Remove", "List", "separator", "Back"]
+        ):
+            case 0: break
+            case 1: ...
+
+def new_company():
+    inq.entry
