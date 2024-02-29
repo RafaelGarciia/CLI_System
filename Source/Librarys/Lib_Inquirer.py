@@ -21,8 +21,10 @@ from InquirerPy.separator       import Separator
 from InquirerPy.utils           import InquirerPyStyle
 from InquirerPy.validator       import PathValidator
 
-from os import name as os_name
-
+from os import (
+    system,
+    name as os_name
+)
 
 class Style():
     """ Simplifies `InqueirerPY's` styling system """
@@ -80,9 +82,46 @@ class Style():
             "spinner_text"      : self.spinner_text         ,
         }
         return get_style(style, False)
-
-
     
+    
+def input_menu(message, entrys, confirm_bt = "Confirm", back_bt = "Back"):
+
+    _return_dict = {}
+
+    for _item in entrys:
+        if type(_item) == tuple:
+            _return_dict.update({_item[0]: "--"})
+
+    while True:
+        system("cls")
+        _exib_entrys = []
+        _index = 0
+        for _item in entrys:
+            _type = type(_item)
+            
+            if _item == Separator:
+                _exib_entrys.append(Separator())
+            elif _type == tuple:
+                _exib_entrys.append(Choice(_index, f"{_item[0]:^10}: {_return_dict[_item[0]]} "))
+            else:
+                input(f"input invalido: {_item}")
+            _index += 1
+
+        _exib_entrys.append(Separator())
+        _exib_entrys.append(Choice("ok", confirm_bt))
+        _exib_entrys.append(Choice("bk", back_bt))
+        
+        _opt = inquirer.select(
+            message             = message                ,
+            choices             = _exib_entrys          ,
+        ).execute()
+
+        if _opt == "ok":
+            return _return_dict
+        elif _opt == "bk":
+            return False
+        else:
+            _return_dict[entrys[_opt][0]] = entrys[_opt][1]()
 
 
 
@@ -120,14 +159,12 @@ def menu(
     """
 
     _menu_options = []
-    _index = 1
+    _index = 0
     for _item in options:
         _item = _item.lower()
 
         if   _item in ("separator"):
             _menu_options.append(Separator())
-        elif _item in ("sair", "exit", "quit", "back", "voltar"):
-            _menu_options.append(Choice(0, _item))
 
         else:
             _menu_options.append(Choice(_index, _item))

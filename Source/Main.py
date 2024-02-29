@@ -201,36 +201,44 @@ dell_supplier = partial(dell , "Supplier")
 
 def main_menu():
 
-    _opt = inq.menu(
-        "Main menu",
-        ["Register", "Exit"]
-    )
-    
-    match _opt:
-        case 0: # Exit
-            exit()
+    while True:
+        system("cls")
+        _opt = inq.menu(
+            "Main menu",
+            ["Register", "Exit"]
+        )
 
-        case 1: # Register
-            registration_menu()
+        match _opt:
+            case 0: # Register
+                registration_menu()
+            
+            case 1: # Exit
+                exit()
         
 def registration_menu():
     while True:
+        system("cls")
         match inq.menu(
             "Registration",
             ["Company", "Supplier", "separator", "Back"]
         ):
-            case 0: break
-            case 1: menu_company_reg()
-            case 2: ...
+            case 0: menu_company_reg()
+            case 1: ...
+            case 3: break
 
 def menu_company_reg():
     while True:
+        system("cls")
         match inq.menu(
             "Company registration",
             ["New", "Remove", "List", "separator", "Back"]
         ):
-            case 0: break
-            case 1: ...
+            case 0: new_company()
+            case 4: break
 
 def new_company():
-    inq.entry
+    def entry_name():
+        return inq.entry("", lambda x: False if x in list_company else True, "Company is are register")
+    
+    inq.input_menu("New Company", [("name", entry_name)])
+
