@@ -117,7 +117,15 @@ def input_menu(message, entrys, confirm_bt = "Confirm", back_bt = "Back"):
         ).execute()
 
         if _opt == "ok":
-            return _return_dict
+            _confirm = True
+            for item in _return_dict.values():
+                if item == None:
+                    input("cannot be null")
+                    _confirm = False
+            
+            if _confirm:
+                return _return_dict
+
         elif _opt == "bk":
             return False
         else:
@@ -213,17 +221,18 @@ def entry(
 
     return inquirer.text(
         message 			= message,
-		validate			= validate,
-		invalid_message		= invalid_message,
-		is_password			= is_password,
-		style				= get_style(style, False),
-		keybindings			= key_binds,
-		qmark				= qmark,
-		amark				= amark,
-		instruction			= instruction,
-		long_instruction	= long_instruction,
-		mandatory			= mandatory,
-		mandatory_message	= mandatory_message
+        validate			= validate,
+        invalid_message		= invalid_message,
+        is_password			= is_password,
+        style				= get_style(style, False),
+        keybindings			= key_binds,
+        qmark				= qmark,
+        amark				= amark,
+        instruction			= instruction,
+        long_instruction	= long_instruction,
+        mandatory			= mandatory,
+        mandatory_message	= mandatory_message,
+        completer           = auto_complet
     ).execute()
 
 
@@ -231,7 +240,7 @@ def confirm(
         message             : str                               ,
         
         confirm_letter		: str			="y"                ,
-		reject_letter		: str			="n"                ,
+        reject_letter		: str			="n"                ,
 
         style               : Style | None  = None              ,
 
@@ -252,16 +261,16 @@ def confirm(
 
     return inquirer.confirm(
         message 			= message,
-		confirm_letter		= confirm_letter,
-		reject_letter		= reject_letter,
-		style				= get_style(style, False),
-		qmark				= qmark,
-		amark				= amark,
-		instruction			= instruction,
-		long_instruction	= long_instruction,
-		keybindings			= key_binds,
-		mandatory			= mandatory,
-		mandatory_message	= mandatory_message
+        confirm_letter		= confirm_letter,
+        reject_letter		= reject_letter,
+        style				= get_style(style, False),
+        qmark				= qmark,
+        amark				= amark,
+        instruction			= instruction,
+        long_instruction	= long_instruction,
+        keybindings			= key_binds,
+        mandatory			= mandatory,
+        mandatory_message	= mandatory_message
     ).execute()
 
 
@@ -303,9 +312,9 @@ def filepath(
         only_files          = file_only,
         validate            = validate,
         qmark				= qmark,
-		amark				= amark,
+        amark				= amark,
         default             = default,
         style               = get_style(style, False),
         instruction			= instruction,
-		long_instruction	= long_instruction,
+        long_instruction	= long_instruction,
     ).execute()
