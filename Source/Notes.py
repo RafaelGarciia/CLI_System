@@ -47,3 +47,12 @@ STYLES = [
 		"spinner_text"		: "#ff0000"	
 	}
 ]
+
+
+"https://inquirerpy.readthedocs.io/en/stable/pages/kb.html"
+key_bind = {
+    "answer": [{"key": "enter"}],   # answer the prompt
+    "interrupt": [{"key": "c-c"}],  # raise KeyboardInterrupt
+    "skip": [{"key": "c-z"}],   # skip the prompt
+    "toggle-all": [{"key": ["c-a", "space"]}]
+}
