@@ -98,8 +98,8 @@ def in_database(function) -> callable:
             "Company"   : list_company,
             "Supplier"  : list_supplier,
         }
-        
-        if parameter[0] in database[name_base]:
+
+        if parameter in database[name_base]:
             return function(name_base, parameter)
         
         else:
@@ -154,11 +154,12 @@ def add(name_base:str, info:list):
             "answermark"    : "#008000"
         }
     )
+    load_db()
 
 @in_database
-def dell(name_base:str, info:list):
+def dell(name_base:str, name:str):
     "Delete data from the database if it exists"
-    data_base.delete(name_base, "name", info[0])
+    data_base.delete(name_base, "name", name)
     inq.entry(
         f"{name_base} successfully deleted !",
         qmark = "@",
@@ -167,6 +168,7 @@ def dell(name_base:str, info:list):
             "answermark"    : "#008000"
         }
     )
+    load_db()
 
 
 "V ------------------- Interface database ------------------ V"
@@ -214,7 +216,10 @@ def main_menu():
             
             case 1: # Exit
                 exit()
-        
+
+
+
+"V ------------------- Registration Menu ------------------- V"
 def registration_menu():
     while True:
         system("cls")
@@ -226,6 +231,8 @@ def registration_menu():
             case 1: ...
             case 3: break
 
+
+"V --------------------- Company Menu ---------------------- V"
 def menu_company_reg():
     while True:
         system("cls")
@@ -234,11 +241,51 @@ def menu_company_reg():
             ["New", "Remove", "List", "separator", "Back"]
         ):
             case 0: new_company()
+            case 1: remove_company()
+            case 2: ls_company()
             case 4: break
 
 def new_company():
     def entry_name():
-        return inq.entry("", lambda x: False if x in list_company else True, "Company is are register")
-    
-    inq.input_menu("New Company", [("name", entry_name)])
+        return inq.entry("",
+            lambda x: False if x in list_company else True,
+            "Company is are register",
+            key_binds = {"skip": [{"key": "alt-q"}]},
+            mandatory = False,
+            long_instruction = "Ctr-Q - back"
+        )
 
+    entry_list = []
+    infos = inq.input_menu("New Company", [("name", entry_name)])
+    if infos == False:
+        return
+    
+    for colum in infos:
+        entry_list.append(infos[colum])
+
+    add_company(entry_list)
+
+def remove_company():
+    entry = inq.entry(
+        "",
+        lambda x: True if x in list_company else False,
+        "Company not found",
+        key_binds = {"skip": [{"key": "alt-q"}]},
+        mandatory = False,
+        long_instruction = "Ctr-Q - back",
+        auto_complet = list_company
+    )
+
+    if entry == None or not inq.confirm(f"Do you want to delete the {entry} company?", "s", "n"):
+        return
+
+    dell_company(entry)
+
+def ls_company():
+    for item in list_company:
+        print(item)
+    input()
+
+
+
+"^ --------------------------------------------------------- ^"
