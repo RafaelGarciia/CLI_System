@@ -64,6 +64,10 @@ else:
 def load_db():
     "Loads the database into memory"
 
+    list_users.clear()
+    list_company.clear()
+    list_supplier.clear()
+
     for _item in data_base.query("User"):
         list_users.update({
             _item[0]:{
@@ -207,14 +211,14 @@ def main_menu():
         system("cls")
         _opt = inq.menu(
             "Main menu",
-            ["Register", "Exit"]
+            ["Register", "separator","Exit"]
         )
 
         match _opt:
             case 0: # Register
                 registration_menu()
             
-            case 1: # Exit
+            case 2: # Exit
                 exit()
 
 
@@ -246,6 +250,7 @@ def menu_company_reg():
             case 4: break
 
 def new_company():
+    load_db()
     def entry_name():
         return inq.entry("",
             lambda x: False if x in list_company else True,
@@ -266,6 +271,7 @@ def new_company():
     add_company(entry_list)
 
 def remove_company():
+    load_db()
     entry = inq.entry(
         "",
         lambda x: True if x in list_company else False,
@@ -282,6 +288,7 @@ def remove_company():
     dell_company(entry)
 
 def ls_company():
+    load_db()
     for item in list_company:
         print(item)
     input()
