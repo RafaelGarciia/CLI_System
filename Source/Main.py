@@ -97,7 +97,7 @@ load_db()
 "V ---------------- Decorators for validation ---------------- V"
 def in_database(function) -> callable:
     "Checks if the parameter is in the database"
-    def valid(name_base:str, parameter:list) -> callable | inq.entry:
+    def valid(name_base:str, parameter:list) -> callable:
         database = {
             "User"      : list_users,
             "Company"   : list_company,
@@ -121,7 +121,7 @@ def in_database(function) -> callable:
 
 def not_in_database(function) -> callable:
     "Checks if the parameter is not in database"
-    def valid(name_base:dict, parameter) -> callable | inq.entry:
+    def valid(name_base:dict, parameter) -> callable:
         database = {
             "User"      : list_users,
             "Company"   : list_company,
