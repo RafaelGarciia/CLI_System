@@ -206,6 +206,10 @@ dell_supplier = partial(dell , "Supplier")
 #"""                        INTERFACES                        """
 #"V ---------------------------------------------------------- V"
 
+
+default_key_binds = {"skip": [{"key": "alt-q"}]}
+default_instruction = "Alt-Q - back"
+
 "V ------------------------ Main Menu ------------------------ V"
 def main_menu():
 
@@ -229,71 +233,105 @@ def registration_menu() -> None:
         system("cls")
         match inq.menu(
             "Registration",
-            ["Company", "Supplier", "separator", "Back"]
+            ["Company", "Supplier", "User","separator", "Back"]
         ):
-            case 0: menu_company_reg()
-            case 1: ...
-            case 3: break
-
-"#  Company Menu"
-def menu_company_reg() -> None:
-    while True:
-        system("cls")
-        match inq.menu(
-            "Company registration",
-            ["New", "Remove", "List", "separator", "Back"]
-        ):
-            case 0: new_company()
-            case 1: remove_company()
-            case 2: ls_company()
+            case 0: menu_registration( "Company" )
+            case 1: menu_registration("Supplier" )
+            case 2: menu_registration(  "User"   )
             case 4: break
 
-def new_company() -> None:
-    load_db()
-    def entry_name():
+def menu_registration(_type) -> None:
+
+    def entry_name() -> str:
         return inq.entry("",
-            lambda x: False if x in list_company else True,
-            "Company is are register",
-            key_binds = {"skip": [{"key": "alt-q"}]},
-            mandatory = False,
-            long_instruction = "Ctr-Q - back"
+            lambda x: False if x in base[_type] else True,
+            invalid_message  = f"{_type} is are register",
+            key_binds        = default_key_binds,
+            mandatory        = False,
+            long_instruction = default_instruction
+        )
+    
+    def entry_generic() -> str:
+        return inq.entry("",
+            key_binds        = default_key_binds,
+            mandatory        = False,
+            long_instruction = default_instruction
         )
 
-    entry_list = []
-    infos = inq.input_menu("New Company", [("name", entry_name)])
-    if infos == False:
-        return
-    
-    for colum in infos:
-        entry_list.append(infos[colum])
+    _entrys = {
+        "User"      : [ ("Name"     , entry_name   ),
+                        ("Password" , entry_generic),
+                        ("Level"    , entry_generic) ],
+        
+        "Company"   : [ ("Name"     , entry_name   ) ],
+        
+        "Supplier"  : [ ("Name"     , entry_name   ),
+                        ("Note"     , entry_generic),
+                        ("Sender"   , entry_generic),
+                        ("Driver"   , entry_generic) ],
+    }
 
-    add_company(entry_list)
+    while True:
+        system("cls")
+        load_db()
+        base = {
+            "User"      : list_users,
+            "Company"   : list_company,
+            "Supplier"  : list_supplier
+        }
+        
+        match inq.menu(
+            f"{_type} Registration",
+            ["New", "Remove", "List", "separator", "Back"]
+        ):
+            case 0:
+                infos = inq.input_menu(f"New {_type}",
+                    _entrys[_type]
+                )
+                
+                if infos == False:
+                    return
+                
+                _entry_list = []
+                for colum in infos:
+                    _entry_list.append(infos[colum])
 
-def remove_company() -> None:
-    load_db()
-    entry = inq.entry(
-        "",
-        lambda x: True if x in list_company else False,
-        "Company not found",
-        key_binds = {"skip": [{"key": "alt-q"}]},
-        mandatory = False,
-        long_instruction = "Ctr-Q - back",
-        auto_complet = list_company
-    )
+                add(_type, _entry_list)
+            
+            case 1:
+                _remove_entry = inq.entry("",
+                    lambda x: True if x in base[_type] else False,
+                    f"{_type} not found",
+                    key_binds = default_key_binds,
+                    mandatory = False,
+                    long_instruction = default_instruction,
+                    auto_complet = {item: None for item in base[_type]}
+                )
 
-    if entry == None or not inq.confirm(f"Do you want to delete the {entry} company?", "s", "n"):
-        return
+                if _remove_entry == None or not inq.confirm(
+                    f"Do you want to delete the {_remove_entry} {_type}?", 
+                    confirm_letter  = "s",
+                    reject_letter   = "n"
+                ): return
+                else:
+                    dell(_type, _remove_entry)
 
-    dell_company(entry)
 
-def ls_company() -> None:
-    load_db()
-    for item in list_company:
-        print(item)
-    input()
+            case 2:
+                print()
+                index = 0
+                for item in base[_type]:
+                    index += 1
+                    print(f"| {index:>2} - {item}")
+                input("\nEnter to continue")
+            
+            case 4: break
 
-"#  Supplier Menu"
-#...
+
+
+
+
+
 
 "^ ----------------------------------------------------------- ^"
 
