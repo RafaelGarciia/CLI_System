@@ -113,7 +113,8 @@ def input_menu(message, entrys, confirm_bt = "Confirm", back_bt = "Back"):
         
         _opt = inquirer.select(
             message             = message                ,
-            choices             = _exib_entrys          ,
+            choices             = _exib_entrys           ,
+            pointer             = ">"
         ).execute()
 
         if _opt == "ok":
