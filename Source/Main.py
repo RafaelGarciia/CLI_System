@@ -6,7 +6,7 @@ from os        import getcwd, system
 from functools import partial
 
 
-"V --------------- Database system variables --------------- V"
+"V ---------------- Database system variables ---------------- V"
 
 list_supplier   :dict   = {}
 "List that stores the company database"
@@ -17,8 +17,7 @@ list_company    :dict   = {}
 list_users      :dict   = {}
 "List that stores the user database"
 
-
-"V ------------------ Database functions ------------------- V"
+"V ------------------- Database functions -------------------- V"
 
 # Instantiating the database
 data_base = sql.Data_base(f"{getcwd()}\\data.db")
@@ -61,13 +60,15 @@ else:
     # If it exists, it just instantiates the database
     data_base.connect()
 
-def load_db():
-    "Loads the database into memory"
+def load_db() -> None:
+    "Loads or reloads the database into memory"
 
+    # Clears dictionaries from memory to be loaded again
     list_users.clear()
     list_company.clear()
     list_supplier.clear()
 
+    # Loads Users dictionary
     for _item in data_base.query("User"):
         list_users.update({
             _item[0]:{
@@ -76,11 +77,13 @@ def load_db():
             }
         })
     
+    # Loads Companys dictionary
     for _item in data_base.query("Company"):
         list_company.update({
             _item[0]: None
         })
     
+    # Loads Suppliers dictionary
     for _item in data_base.query("Supplier"):
         list_supplier.update({
             _item[0]:{
@@ -91,12 +94,10 @@ def load_db():
         })
 load_db()
 
-
-"V --------------- Decorators for validation --------------- V"
-
+"V ---------------- Decorators for validation ---------------- V"
 def in_database(function) -> callable:
     "Checks if the parameter is in the database"
-    def valid(name_base:str, parameter:list) -> callable:
+    def valid(name_base:str, parameter:list) -> callable | inq.entry:
         database = {
             "User"      : list_users,
             "Company"   : list_company,
@@ -118,9 +119,9 @@ def in_database(function) -> callable:
     
     return valid
 
-def not_in_database(function):
+def not_in_database(function) -> callable:
     "Checks if the parameter is not in database"
-    def valid(name_base:dict, parameter):
+    def valid(name_base:dict, parameter) -> callable | inq.entry:
         database = {
             "User"      : list_users,
             "Company"   : list_company,
@@ -142,8 +143,7 @@ def not_in_database(function):
 
     return valid
 
-
-"V ------------------- Interact database ------------------- V"
+"V -------------------- Interact database -------------------- V"
 # funcions that interact with the database
 
 @not_in_database
@@ -174,37 +174,39 @@ def dell(name_base:str, name:str):
     )
     load_db()
 
-
-"V ------------------- Interface database ------------------ V"
+"V -------------------- Interface database ------------------- V"
+# Partials
 
 add_company   = partial(add  , "Company" )
 """ Partial to add a Company to the database.\n
-    add_company( list["Company name"] )                     """
+    `add_company( list["Company name"] )`                     """
 
 add_user      = partial(add  , "User"    )
 """ Partial to add a User to the database.\n
-    add_user( list["User_name", "password", "level"] )      """
+    `add_user( list["User_name", "password", "level"] )`      """
 
 add_supplier  = partial(add  , "Supplier")
 """ Partial to add a Supplier to the database.\n
-    add_supplier( list["Name", "Note", "Sender", "Driver"] )"""
+    `add_supplier( list["Name", "Note", "Sender", "Driver"] )`"""
 
 dell_company  = partial(dell , "Company" )
 """ Partial to delete a Company to the database.\n
-    dell_company( list["Company name"] )                    """
+    `dell_company( list["Company name"] )`                    """
 
 dell_user     = partial(dell , "User"    )
 """ Partial to delete a User to the database.\n
-    dell_user( list["User name"] )                          """
+    `dell_user( list["User name"] )`                          """
 
 dell_supplier = partial(dell , "Supplier")
 """ Partial to delete a Supplier to the database.\n
-    dell_user( list["Supplier name"] )                      """
+    `dell_user( list["Supplier name"] )`                      """
 
-"^ --------------------------------------------------------- ^"
+"^ ----------------------------------------------------------- ^"
 
+#"""                        INTERFACES                        """
+#"V ---------------------------------------------------------- V"
 
-
+"V ------------------------ Main Menu ------------------------ V"
 def main_menu():
 
     while True:
@@ -221,10 +223,8 @@ def main_menu():
             case 2: # Exit
                 exit()
 
-
-
-"V ------------------- Registration Menu ------------------- V"
-def registration_menu():
+"V -------------------- Registration Menu -------------------- V"
+def registration_menu() -> None:
     while True:
         system("cls")
         match inq.menu(
@@ -235,9 +235,8 @@ def registration_menu():
             case 1: ...
             case 3: break
 
-
-"V --------------------- Company Menu ---------------------- V"
-def menu_company_reg():
+"#  Company Menu"
+def menu_company_reg() -> None:
     while True:
         system("cls")
         match inq.menu(
@@ -249,7 +248,7 @@ def menu_company_reg():
             case 2: ls_company()
             case 4: break
 
-def new_company():
+def new_company() -> None:
     load_db()
     def entry_name():
         return inq.entry("",
@@ -270,7 +269,7 @@ def new_company():
 
     add_company(entry_list)
 
-def remove_company():
+def remove_company() -> None:
     load_db()
     entry = inq.entry(
         "",
@@ -287,12 +286,18 @@ def remove_company():
 
     dell_company(entry)
 
-def ls_company():
+def ls_company() -> None:
     load_db()
     for item in list_company:
         print(item)
     input()
 
+"#  Supplier Menu"
+#...
+
+"^ ----------------------------------------------------------- ^"
 
 
-"^ --------------------------------------------------------- ^"
+
+
+
