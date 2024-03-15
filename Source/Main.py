@@ -6,7 +6,7 @@ from os        import getcwd, system
 from functools import partial
 
 
-"V ---------------- Database system variables ---------------- V"
+#V ---------------- Database system variables ---------------- V
 
 list_supplier   :dict   = {}
 "List that stores the company database"
@@ -17,7 +17,7 @@ list_company    :dict   = {}
 list_users      :dict   = {}
 "List that stores the user database"
 
-"V ------------------- Database functions -------------------- V"
+#V ------------------- Database functions -------------------- V
 
 # Instantiating the database
 data_base = sql.Data_base(f"{getcwd()}\\data.db")
@@ -43,7 +43,7 @@ if not data_base.exist:
         )
         data_base.create_table(
             "Supplier",
-            [ "name", "note", "sender", "driver" ]
+            [ "name", "note", "from", "driver" ]
         )
 
         data_base.insert("User", ['root', 'masterqi'   , 0])
@@ -88,67 +88,33 @@ def load_db() -> None:
         list_supplier.update({
             _item[0]:{
                 'note'      : _item[1],
-                'sender'    : _item[2],
+                'from'      : _item[2],
                 'driver'    : _item[3]
             }
         })
 load_db()
 
-"V ---------------- Decorators for validation ---------------- V"
-def in_database(function) -> callable:
-    "Checks if the parameter is in the database"
-    def valid(name_base:str, parameter:list) -> callable:
-        database = {
-            "User"      : list_users,
-            "Company"   : list_company,
-            "Supplier"  : list_supplier,
-        }
-
-        if parameter in database[name_base]:
-            return function(name_base, parameter)
-        
-        else:
-            return inq.entry(
-                f"Unregistered {name_base} !",
-                qmark = "X",
-                style = {
-                    "questionmark"  : "#900020",
-                    "answermark"    : "#900020"
-                }
-            )
-    
-    return valid
-
-def not_in_database(function) -> callable:
-    "Checks if the parameter is not in database"
-    def valid(name_base:dict, parameter) -> callable:
-        database = {
-            "User"      : list_users,
-            "Company"   : list_company,
-            "Supplier"  : list_supplier,
-        }
-
-        if parameter[0] not in database[name_base]:
-            return function(name_base, parameter)
-        
-        else:
-            return inq.entry(
-                f"{name_base} already registered !",
-                qmark = "X",
-                style = {
-                    "questionmark"  : "#900020",
-                    "answermark"    : "#900020"
-                }
-            )
-
-    return valid
-
-"V -------------------- Interact database -------------------- V"
-# funcions that interact with the database
-
-@not_in_database
+#V -------------------- Interact database -------------------- V
+# Funcions that interact with the database
 def add(name_base:str, info:list):
     "Adds data to the database if it doesn t exist"
+    _aux_database = {
+            "User"      : list_users,
+            "Company"   : list_company,
+            "Supplier"  : list_supplier,
+        }
+    
+    # Checks if the data already exists
+    if info[0] in _aux_database[name_base]:
+        return inq.entry(
+            f"{name_base} already registered !",
+            qmark = "X",
+            style = {
+                "questionmark"  : "#900020",
+                "answermark"    : "#900020"
+            }
+        )
+    
     data_base.insert(name_base, info)
     inq.entry(
         f"{name_base} registered successfully !",
@@ -160,9 +126,25 @@ def add(name_base:str, info:list):
     )
     load_db()
 
-@in_database
 def dell(name_base:str, name:str):
     "Delete data from the database if it exists"
+    _aux_database = {
+            "User"      : list_users,
+            "Company"   : list_company,
+            "Supplier"  : list_supplier,
+        }
+    
+    # Checks if the data already exists
+    if name not in _aux_database[name_base]:
+        return inq.entry(
+            f"Unregistered {name_base} !",
+            qmark = "X",
+            style = {
+                "questionmark"  : "#900020",
+                "answermark"    : "#900020"
+            }
+        )
+
     data_base.delete(name_base, "name", name)
     inq.entry(
         f"{name_base} successfully deleted !",
@@ -174,15 +156,18 @@ def dell(name_base:str, name:str):
     )
     load_db()
 
-
 #"""                        INTERFACES                        """
-#"V ---------------------------------------------------------- V"
+#V ----------------------------------------------------------- V
 
-default_key_binds = {"skip": [{"key": "alt-q"}]}
+default_key_binds   = {"skip": [{"key": "alt-q"}]}
+"Default keyboard shortcuts, used in all questions"
+
 default_instruction = "Alt-Q - back"
+"Standard instruction on keyboard shortcuts"
 
-"V ------------------------ Main Menu ------------------------ V"
+#V ------------------------ Main Menu ------------------------ V
 def main_menu():
+    "Main menu, system start"
 
     while True:
         system("cls")
@@ -200,18 +185,20 @@ def main_menu():
 
 "V -------------------- Registration Menu -------------------- V"
 def registration_menu() -> None:
+    "Registration home menu"
+    
     while True:
         system("cls")
         match inq.menu(
             "Registration",
             ["Company", "Supplier", "User","separator", "Back"]
         ):
-            case 0: menu_registration( "Company" )
-            case 1: menu_registration("Supplier" )
-            case 2: menu_registration(  "User"   )
+            case 0: registration( "Company" )
+            case 1: registration("Supplier" )
+            case 2: registration(  "User"   )
             case 4: break
 
-def menu_registration(_type) -> None:
+def registration(_type) -> None:
 
     def entry_name() -> str:
         return inq.entry("",
@@ -238,7 +225,7 @@ def menu_registration(_type) -> None:
         
         "Supplier"  : [ ("Name"     , entry_name   ),
                         ("Note"     , entry_generic),
-                        ("Sender"   , entry_generic),
+                        ("From"     , entry_generic),
                         ("Driver"   , entry_generic) ],
     }
 
