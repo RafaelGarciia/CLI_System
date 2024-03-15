@@ -3,7 +3,6 @@ from Librarys  import (
     Lib_Inquirer as inq
 )
 from os        import getcwd, system
-from functools import partial
 
 
 #V ---------------- Database system variables ---------------- V
