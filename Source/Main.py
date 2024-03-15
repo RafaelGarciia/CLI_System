@@ -174,38 +174,9 @@ def dell(name_base:str, name:str):
     )
     load_db()
 
-"V -------------------- Interface database ------------------- V"
-# Partials
-
-add_company   = partial(add  , "Company" )
-""" Partial to add a Company to the database.\n
-    `add_company( list["Company name"] )`                     """
-
-add_user      = partial(add  , "User"    )
-""" Partial to add a User to the database.\n
-    `add_user( list["User_name", "password", "level"] )`      """
-
-add_supplier  = partial(add  , "Supplier")
-""" Partial to add a Supplier to the database.\n
-    `add_supplier( list["Name", "Note", "Sender", "Driver"] )`"""
-
-dell_company  = partial(dell , "Company" )
-""" Partial to delete a Company to the database.\n
-    `dell_company( list["Company name"] )`                    """
-
-dell_user     = partial(dell , "User"    )
-""" Partial to delete a User to the database.\n
-    `dell_user( list["User name"] )`                          """
-
-dell_supplier = partial(dell , "Supplier")
-""" Partial to delete a Supplier to the database.\n
-    `dell_user( list["Supplier name"] )`                      """
-
-"^ ----------------------------------------------------------- ^"
 
 #"""                        INTERFACES                        """
 #"V ---------------------------------------------------------- V"
-
 
 default_key_binds = {"skip": [{"key": "alt-q"}]}
 default_instruction = "Alt-Q - back"
