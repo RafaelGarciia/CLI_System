@@ -172,17 +172,18 @@ def main_menu():
         system("cls")
         _opt = inq.menu(
             "Main menu",
-            ["Register", "separator","Exit"]
+            ["New MP", "Register", "separator", "Exit"]
         )
 
         match _opt:
-            case 0: # Register
+            case 1: # Register
                 registration_menu()
             
-            case 2: # Exit
+            case 3: # Exit
                 exit()
 
 "V -------------------- Registration Menu -------------------- V"
+
 def registration_menu() -> None:
     "Registration home menu"
     
@@ -228,6 +229,47 @@ def registration(_type) -> None:
                         ("Driver"   , entry_generic) ],
     }
 
+    def list_base   () -> None:
+        print()
+        index = 0
+        for item in base[_type]:
+            index += 1
+            print(f"| {index:>2} - {item}")
+        input("\nEnter to continue")
+
+    def remove_base () -> None:
+        _remove_entry = inq.entry("",
+            lambda x: True if x in base[_type] else False,
+            f"{_type} not found",
+            key_binds = default_key_binds,
+            mandatory = False,
+            long_instruction = default_instruction,
+            auto_complet = {item: None for item in base[_type]}
+        )
+
+        if _remove_entry == None or not inq.confirm(
+            f"Do you want to delete the {_remove_entry} {_type}?", 
+            confirm_letter  = "s",
+            reject_letter   = "n"
+        ): return
+        else:
+            dell(_type, _remove_entry)
+
+    def new_base    () -> None:
+        infos = inq.input_menu(f"New {_type}",
+            _entrys[_type]
+        )
+        
+        if infos == False:
+            return
+        
+        _entry_list = []
+        for colum in infos:
+            _entry_list.append(infos[colum])
+
+        add(_type, _entry_list)
+
+
     while True:
         system("cls")
         load_db()
@@ -241,55 +283,22 @@ def registration(_type) -> None:
             f"{_type} Registration",
             ["New", "Remove", "List", "separator", "Back"]
         ):
-            case 0:
-                infos = inq.input_menu(f"New {_type}",
-                    _entrys[_type]
-                )
-                
-                if infos == False:
-                    return
-                
-                _entry_list = []
-                for colum in infos:
-                    _entry_list.append(infos[colum])
-
-                add(_type, _entry_list)
-            
-            case 1:
-                _remove_entry = inq.entry("",
-                    lambda x: True if x in base[_type] else False,
-                    f"{_type} not found",
-                    key_binds = default_key_binds,
-                    mandatory = False,
-                    long_instruction = default_instruction,
-                    auto_complet = {item: None for item in base[_type]}
-                )
-
-                if _remove_entry == None or not inq.confirm(
-                    f"Do you want to delete the {_remove_entry} {_type}?", 
-                    confirm_letter  = "s",
-                    reject_letter   = "n"
-                ): return
-                else:
-                    dell(_type, _remove_entry)
-
-
-            case 2:
-                print()
-                index = 0
-                for item in base[_type]:
-                    index += 1
-                    print(f"| {index:>2} - {item}")
-                input("\nEnter to continue")
-            
+            case 0: new_base    ()
+            case 1: remove_base ()
+            case 2: list_base   ()
             case 4: break
 
-
-
-
-
-
-
 "^ ----------------------------------------------------------- ^"
+
+
+
+
+
+
+
+
+
+
+
 
 main_menu()
