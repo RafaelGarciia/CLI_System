@@ -215,7 +215,7 @@ def entry(
 
         mandatory           : bool          = True              ,
         mandatory_message   : str           = "Mandatory Entry" ,
-    ) -> str | int:
+    ) -> str:
 
     """
     """
