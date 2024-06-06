@@ -58,6 +58,7 @@ class SQL_DB():
         self.file_path        = file_path
         self.version_base     = self.get_version_base()
         self.table_properties = {}
+        self.table_data       = {}
 
         self.load_db()
 
@@ -87,8 +88,18 @@ class SQL_DB():
         list_table_names = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchone()
         if list_table_names != None:
             for table in list_table_names:
-                table_columns = [column[0] for column in cursor.execute(f'SELECT * FROM {table}').description]
-            self.table_properties[str(table)] = {'collumns': table_columns}
+                table_data = cursor.execute(f'SELECT * FROM {table}')
+                table_columns = [column[0] for column in table_data.description]
+                self.table_properties.update({table: {}})
+                self.table_properties[table].update({'collumns': table_columns })
+                self.table_properties[table].update({'content' : {}            })
+
+                for row in table_data:
+                    data = [item for item in row]
+                    primary_key = data[0]
+                    self.table_properties[str(table)]['content'].update({primary_key: {}})
+                    for index, collumn in enumerate(self.table_properties[str(table)]['collumns']):
+                        self.table_properties[str(table)]['content'][primary_key].update({collumn: data[index]})
         connection.close()
 
     def insert(self, table_name:str, values:list[str]) -> bool:
