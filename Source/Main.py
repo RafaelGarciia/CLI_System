@@ -4,11 +4,11 @@ from Librarys  import (
     Color_Lib
 )
 from os        import getcwd, system
-from Modules import module_Security as sec
+from Modules    import module_Security as sec
 
 c = Color_Lib.Color()
 
-data_base = None
+data_base:sql.SQL_DB = None
 
 
 def initialization():
@@ -17,10 +17,11 @@ def initialization():
     data_base = sql.SQL_DB(f"{getcwd()}\\Database\\data.db")
     print(f'{c.blue}# {c.clear}Booting...')
     if data_base.table_properties == {}:
-        data_base.create_table('users', ['name', 'passwd', 'level'])
+        data_base.create_table('users', ['login', 'passwd', 'level'])
         print(f'{c.blue}|\t{c.green}V {c.clear}Created user table')
         data_base.insert('users', ['master', 'root', 0])
         print(f'{c.blue}|\t{c.green}V {c.clear}Default administrative user entered')
+        data_base.insert('users', ['hero', '3232', 0])
 
     print(c.clear)
 
@@ -29,4 +30,5 @@ def initialization():
 
 
 initialization()
-sec.login(data_base.)
+#input(data_base.table_properties['users'])
+sec.login(data_base.table_properties['users'])
