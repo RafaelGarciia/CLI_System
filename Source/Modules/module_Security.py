@@ -1,6 +1,10 @@
-from Librarys import Inquirer_Lib as inq
+from Librarys import (
+	Inquirer_Lib 	as inq,
+	Color_Lib 		as c
+)
 from os import system
 from time import sleep
+
 
 
 def login(users_data:dict):
@@ -25,25 +29,25 @@ def login(users_data:dict):
 	while not acess:
 		system("cls")
 		user_answer_entry = inq.Entry(
-			message				= "Login:",
+			message				= "   Login:",
 			validate			= login_valid,
-			invalid_message		= "Usuario não cadastrado.",
+			invalid_message		= "Unregistered user.",
 			style				= default_style,
 			question_mark		= ">",
 			answer_mark			= "|",
-			long_instruction	= "| C-Q : Sair |",
+			long_instruction	= "| C-Q : Exit |",
 			mandatory			= False
 		)
 		user_answer_entry.keybindings = {"interrupt": [{"key": "c-q"}]}
 		
 		password_answer_entry = inq.Entry(
-			message				= "Senha:",
+			message				= "Password:",
 			validate			= password_valid,
-			invalid_message		= "Senha invalida.",
+			invalid_message		= "Invalid Password.",
 			style				= default_style,
 			question_mark		= ">",
 			answer_mark			= "|",
-			long_instruction	= "| C-B : Voltar | C-Q : Sair",
+			long_instruction	= "| C-B : Back | C-Q : Exit",
 			mandatory			= False,
 			is_password			= True
 		)
@@ -57,6 +61,7 @@ def login(users_data:dict):
 
 		if user_answer != None and password_answer != None:
 			system("cls")
-			print(f"\033[32m Logado! \033[m \n Bem vindo \033[36m{user_answer.upper()}\033[m", end=sleep(2))
+			print(f"{c.green} Logged ! {c.clear} \n Welcome {c.blue}{user_answer.upper()}{c.clear}")
+			sleep(2)
 			return True, users_data['content'][user_answer]
 
