@@ -1,11 +1,11 @@
-# Pasta de cache do python
+# Python cache folder
 __pycache__/
 
-# Pasta de configs do vscode
+# vscode configs folder
 .vscode
 
-# Base de dados
+# Data base
 *.db
 
-# Arquivo de testes de conceito rapido
+# Rapid concept testing files
 teste.py
