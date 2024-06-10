@@ -64,14 +64,6 @@ class Style():
         }
         return get_style(style, False)
 
-class Option():
-    def __init__(self, message:str, value:any = None) -> None:
-        self.message = message
-        self.value = value
-    
-    def __call__(self) -> Any:
-        self.value = self.message if self.value == None else self.value
-        return Choice(self.value, self.message)
 
 class Entry():
     def __init__(self,
@@ -123,7 +115,7 @@ class Entry():
 class Select():
     def __init__(self,
             messagem            : str = '',
-            choices             : list[Option] = [Option('Option 1', None)],
+            choices             : list[Choice] = [Choice(None, 'Option 1')],
             default             : str = None,
             style               : Style = None,
             question_mark       : str = '|',
