@@ -13,6 +13,7 @@ from random     import randint
 
 data_base:sql.SQL_DB = None
 db_file = f"{getcwd()}\\Database\\data.db"
+user_loged = {'login': 'guest', 'passwd': None, 'level': 9}
 time_active:bool = True
 visual_mode:bool = True
 
