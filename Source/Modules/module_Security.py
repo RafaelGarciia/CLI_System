@@ -3,7 +3,7 @@ from os import system
 from time import sleep
 
 
-def login(users_data):
+def login(users_data:dict):
 	
 	default_style = inq.Style()
 	default_style.questionmark = "#32cd32"
@@ -21,7 +21,6 @@ def login(users_data):
 	def password_valid(password_answer):
 		if password_answer == users_data['content'][user_answer]["passwd"]: return True
 
-
 	acess = False
 	while not acess:
 		system("cls")
@@ -36,8 +35,7 @@ def login(users_data):
 			mandatory			= False
 		)
 		user_answer_entry.keybindings = {"interrupt": [{"key": "c-q"}]}
-		user_answer=  user_answer_entry()
-
+		
 		password_answer_entry = inq.Entry(
 			message				= "Senha:",
 			validate			= password_valid,
@@ -53,11 +51,12 @@ def login(users_data):
 			"interrupt": [{"key": "c-q"}],
 			"skip": [{"key": "c-b"}]
 		}
+
+		user_answer=  user_answer_entry()
 		password_answer = password_answer_entry()
 
 		if user_answer != None and password_answer != None:
 			system("cls")
-			print(f"\033[32m Logado! \033[m \n Bem vindo \033[36m{user_answer.upper()}\033[m")
-			sleep(2)
-			return True
+			print(f"\033[32m Logado! \033[m \n Bem vindo \033[36m{user_answer.upper()}\033[m", end=sleep(2))
+			return True, users_data['content'][user_answer]
 
