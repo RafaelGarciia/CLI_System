@@ -8,11 +8,13 @@ from Modules    import module_Security as sec
 from time       import sleep
 from random     import randint
 
-# Root variables
+
+
+
 data_base:sql.SQL_DB = None
 db_file = f"{getcwd()}\\Database\\data.db"
-user_loged = {'login': 'guest', 'passwd': None, 'level': None}
-time_active = True
+time_active:bool = True
+visual_mode:bool = True
 
 
 
@@ -66,6 +68,7 @@ def exiting():
     system('cls')
     exit()
 
+# General functions
 def initialization():
     global data_base
     global db_file
@@ -99,14 +102,18 @@ def get_command():
     
 
 
+# Command Line mode
 
 
 
 
 
 
+# Visual mode
 
+style = inq.Style()
 
+style = style()
 
 
 
