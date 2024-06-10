@@ -22,52 +22,9 @@ visual_mode:bool = True
 def main_loop():
     initialization()
     while True:
-        command_str:str = get_command()
-
-        if " " in command_str:
-            command_str:list = command_str.split(' ')
-            main_command = command_str.pop(0)
-        else: main_command = command_str
-
-
-        match main_command:
-            case 'exit'   : exiting()
-            case 'login'  : login_system()
-            case 'time'   : set_time_active()
-            case 'reboot' : initialization()
-
-
-# FUNCTIONS
-def login_system():
-    global user_loged
-
-    infos = sec.login(data_base.table_properties['users'])
-    if infos[0]:
-        user_loged = infos[1]
-
-def time_load():
-    global time_active
-
-    if time_active:
-        sleep(float(f'{randint(0, 2)}.{randint(0, 9)}'))
-
-def set_time_active():
-    global user_loged
-    global time_active
-
-    if user_loged['level'] == None:
-        print(f'Usuario não logado')
-    elif user_loged['level'] < 2:
-        time_active = not time_active
-        print(f'time if {time_active}')
-    else:
-        print(f'Usuario não tem permissão para isso')
-
-def exiting():
-    print(f'{c.blue}> {c.red}Saindo... {c.clear}')
-    time_load()
-    system('cls')
-    exit()
+        if visual_mode:   visual_main_loop()
+        else:             command_line_main_loop()
+        
 
 # General functions
 def initialization():
@@ -94,19 +51,81 @@ def initialization():
 
     print(c.clear)
 
-def get_command():
-    global c
+def time_load():
+    global time_active
+
+    if time_active:
+        sleep(float(f'{randint(0, 2)}.{randint(0, 9)}'))
+
+def exiting():
+    print(f'{c.blue}> {c.red}Saindo... {c.clear}')
+    time_load()
+    system('cls')
+    exit()
+
+def login_system():
     global user_loged
+    global data_base
+
+    infos = sec.login(data_base.table_properties['users'])
+    if infos[0]:
+        user_loged = infos[1]
+
+def set_time_active():
+    global user_loged
+    global time_active
+
+    if user_loged['level'] < 2:
+        time_active = not time_active
+        print(f'time if {time_active}')
+    else:
+        print(f'Usuario não tem permissão para isso')
+
+def set_visual_mode():
+    global visual_mode
+    visual_mode = not visual_mode
+    system('cls')
+
+def whoami():
+    global user_loged
+    global c
 
     print(f'{c.blue}[{c.green}{user_loged['login']}{c.blue}] {c.clear}')
-    return inq.Entry("", question_mark='>')()
-    
 
 
 # Command Line mode
+def command_line_main_loop():
+    command:str = get_command()
 
+    if " " in command:
+        arguments:list = command.split(' ')
+        main_command = arguments.pop(0)
+    else:
+        main_command = command
+        arguments = None
+    
+    del command
+    match main_command:
+        case 'exit'   : exiting()
+        case 'login'  : login_system()
+        case 'time'   : set_time_active()
+        case 'reboot' : initialization()
+        case 'vmode'  : set_visual_mode()
+        case 'help'   : helper()
 
+def get_command():
+    whoami()
+    return inq.Entry("", question_mark='>')()
 
+def helper():
+    print("#---------------------- HELP ----------------------#")
+    print("v Commands v             v  Efects  v               ")
+    print("    exit   - To exit the system                     ")
+    print("   login   - To log in with a user                  ")
+    print("    time   - To disable loading delays              ")
+    print("   reboot  - To restart system and reload database  ")
+    print("   vmode   - To activate Visual mode                ")
+    print("                                                    ")
 
 
 
@@ -116,6 +135,49 @@ style = inq.Style()
 
 style = style()
 
+def visual_main_loop():
+    global style
+
+    choices_list = []
+    choices_list.append(inq.Choice('c', 'Config'))
+    choices_list.append(inq.Separator())
+    choices_list.append(inq.Choice( 0 , 'Exit'  ))
+
+    system('cls')
+    whoami()
+    opt = inq.Select('Main menu',
+        choices       = choices_list,
+        style         = style,
+        marker_empty  = ' ',
+    )()
+
+    match opt:
+        case 'c': config_menu()
+        case 0  : exiting()
+
+def config_menu():
+    while True:
+        choices_list = []
+        choices_list.append(inq.Choice('login', 'Log in'))
+
+        if user_loged['level'] < 2:
+            choices_list.append(inq.Choice('c_mode', 'Command line Mode'))
+        
+        choices_list.append(inq.Separator())
+        choices_list.append(inq.Choice( 0 , 'Back'))
+        
+        system('cls')
+        whoami()
+        opt = inq.Select('Config',
+            choices       = choices_list,
+            style         = style,
+            marker_empty  = ' ',
+        )()
+
+        match opt:
+            case 'login'    : login_system()    ; break
+            case 'c_mode'   : set_visual_mode() ; break
+            case 0          : break
 
 
 
