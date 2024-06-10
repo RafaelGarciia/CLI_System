@@ -8,10 +8,13 @@ from Modules    import module_Security as sec
 from time       import sleep
 from random     import randint
 
+# Root variables
 data_base:sql.SQL_DB = None
 db_file = f"{getcwd()}\\Database\\data.db"
 user_loged = {'login': 'guest', 'passwd': None, 'level': None}
 time_active = True
+
+
 
 def main_loop():
     initialization()
@@ -21,17 +24,17 @@ def main_loop():
         if " " in command_str:
             command_str:list = command_str.split(' ')
             main_command = command_str.pop(0)
-        else:
-            main_command = command_str
+        else: main_command = command_str
+
 
         match main_command:
-            case 'exit':    exiting()
-            case 'login':   login_system()
-            case 'time':    set_time_active()
-            case 'reboot':  initialization()
+            case 'exit'   : exiting()
+            case 'login'  : login_system()
+            case 'time'   : set_time_active()
+            case 'reboot' : initialization()
+
 
 # FUNCTIONS
-
 def login_system():
     global user_loged
 
@@ -87,8 +90,7 @@ def initialization():
 
     print(c.clear)
 
-
-def get_command():    
+def get_command():
     global c
     global user_loged
 
@@ -96,7 +98,17 @@ def get_command():
     return inq.Entry("", question_mark='>')()
     
 
-#
+
+
+
+
+
+
+
+
+
+
+
 
 
 main_loop()
